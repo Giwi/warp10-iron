@@ -1,0 +1,34 @@
+{
+  "name": "warp10-iron",
+  "authors": [
+    "Horacio Gonzalez <horacio.gonzalez@gmail.com>"
+  ],
+  "description": "Warp10 Iron Components",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "warp 10",
+    "warp10",
+    "warpscript",
+    "ide"
+  ],
+  "main": "",
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
+  "homepage": "https://warp10.io",
+  "ignore": [],
+  "dependencies": {
+    "polymer": "Polymer/polymer#~1.2.0",
+    "iron-overlay-behavior": "PolymerElements/iron-overlay-behavior#~1.1.2",
+    "iron-ajax": "PolymerElements/iron-ajax#^1.1.0",
+    "iron-validator-behavior": "PolymerElements/iron-validator-behavior#~1.0.1"
+  },
+  "devDependencies": {
+    "bootstrap": "~3.3.2"
+  }
+}

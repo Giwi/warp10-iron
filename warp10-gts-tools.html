@@ -1,0 +1,225 @@
+<script>
+  (function() {
+    var gtsTools = {};
+
+    /***********************************************************************************
+    * Returns true if @value is an Array
+    ***********************************************************************************/
+    gtsTools.isArray = function(value) {
+      return value && typeof value === 'object' && value instanceof Array && typeof value.length === 'number'
+        && typeof value.splice === 'function' && !(value.propertyIsEnumerable('length'));
+    };
+
+    /***********************************************************************************
+    * Returns true if @gts is a valid gts
+    ***********************************************************************************/
+    gtsTools.isGts = function(gts) {
+      if ( gts == null || gts.c == null || gts.l == null || gts.a == null || gts.v == null || !gtsTools.isArray(gts.v) ){
+        return false;
+      }
+      return true;
+    }
+
+    /***********************************************************************************
+    * Returns true if @data is a valid response object
+    ***********************************************************************************/
+    gtsTools.isValidResponse = function(data) {
+
+      var response;
+
+      try {
+        response = JSON.parse(data);
+        //console.debug(response)
+      } catch(e){
+        console.error("Response non JSON compliant",data);
+        return false;
+      }
+
+      if (!gtsTools.isArray(response)) {
+        console.error("Response isn't an Array",response);
+        return false;
+      }
+
+      return true;
+    };
+
+
+    /***********************************************************************************
+    * Returns true if item of received JSON is an embedded image
+    ***********************************************************************************/
+    gtsTools.isEmbeddedImage = function(gts) {
+      if (typeof gts === !'string' || !/^data:image/.test(gts)) {
+        return false;
+      }
+      return true;
+    };
+    /***********************************************************************************
+    * Returns true if item of received JSON is an object with an embedded Image
+    ***********************************************************************************/
+    gtsTools.isEmbeddedImageObject = function(gts) {
+      if ((gts == null) || (gts.image == null) || (gts.caption == null) || !gtsTools.isEmbeddedImage(gts.image)) {
+        return false;
+      }
+      return true;
+    };
+
+    /***********************************************************************************
+    * Generates a GTS datapoint from a datapoint of received JSON
+    ***********************************************************************************/
+    gtsTools.metricFromJSON = function(json) {
+      var metric;
+      metric = {
+        ts: json[0]
+      };
+      switch (json.length) {
+        case 2:
+          metric.value = json[1];
+          break;
+        case 4:
+          metric.lat = json[1];
+          metric.lon = json[2];
+          metric.value = json[3];
+          break;
+        case 5:
+          metric.lat = json[1];
+          metric.lon = json[2];
+          metric.alt = json[3];
+          metric.value = json[4];
+      }
+      return metric;
+    };
+
+    /***********************************************************************************
+    * Generates a GTS stack item from an item of received JSON
+    ***********************************************************************************/
+    gtsTools.gtsFromJSON = function(json, id) {
+      var gts, j, len, metric, ref;
+      gts = {
+        c: json.c,
+        l: json.l,
+        a: json.a,
+        v: [],
+        id: id
+      };
+      ref = json.v;
+      for (j = 0; j < json.v.length; j++) {
+        metric = json.v[j];
+        gts.v.push(gtsTools.metricFromJSON(metric));
+      }
+      return {
+        gts: gts
+      };
+    };
+
+
+    /***********************************************************************************
+    * Generates a GTS stack from the received JSON
+    ***********************************************************************************/
+    gtsTools.gtsFromJSONList = function(jsonList, prefixId) {
+      // console.debug("[czd-gts-tools] gtsFromJSONList, jsonList", {list: jsonList});
+      var gts, gtsList, i, id;
+      gtsList = [];
+      for (i = 0;  i < jsonList.length; i++) {
+        gts = jsonList[i];
+        if ((prefixId !== undefined) && (prefixId !== "")) {
+          id = prefixId + "-" + i;
+        } else {
+          id = "" + i;
+        }
+
+        if (gtsTools.isArray(gts)) {
+          gtsList.push(gtsTools.gtsFromJSONList(gts, id));
+        }
+        if (gtsTools.isGts(gts)) {
+          gtsList.push(gtsTools.gtsFromJSON(gts, id));
+        }
+        if (gtsTools.isEmbeddedImage(gts)) {
+          gtsList.push({
+            image: gts,
+            caption: "Image",
+            id: id
+          });
+        }
+        if (gtsTools.isEmbeddedImageObject(gts)) {
+          gtsList.push({
+            image: gts.image,
+            caption: gts.caption,
+            id: id
+          });
+        }
+        // console.debug("[czd-gts-tools] gtsFromJSONList, gtsList ", gtsList);
+
+      }
+      return {
+        content: gtsList
+      };
+    };
+
+    /***********************************************************************************
+    * Flatten a GTS array
+    ***********************************************************************************/
+    gtsTools.flattenGtsIdArray = function(a, r) {
+      var elem, j ;
+
+      if (!r) {
+        r = [];
+      }
+      for (j = 0; j < a.content.length; j++) {
+        elem = a.content[j];
+        if (elem.content != null) {
+          this.flattenGtsIdArray(elem, r);
+        } else {
+          if (elem.gts !== undefined) {
+            r.push(elem.gts);
+          }
+        }
+      }
+      return r;
+    };
+
+    /***********************************************************************************
+    * Generated a serialized version of GTS metadata
+    ***********************************************************************************/
+    gtsTools.serializeGtsMetadata = function(gts) {
+      var key, ref, serializedGtsMetadata, value;
+      serializedGtsMetadata = gts.id + " " + gts.c + "{";
+      ref = gts.l;
+      for (key in ref) {
+        value = ref[key];
+        serializedGtsMetadata += key + "=" + value + ",";
+      }
+      serializedGtsMetadata.slice(0, -1);
+      return serializedGtsMetadata += "}";
+    };
+
+    /***********************************************************************************
+    * DEPRECATED
+    ***********************************************************************************/
+    gtsTools.isGtsStack = function(gtsStack) {
+
+      if (!gtsTools.isArray(gtsStack)) {
+        console.debug("[gtsTools] isGtsStack false - not an Array", gtsStack);
+        return false;
+      }
+      for (var i=0; i<gtsStack.length; i++) {
+        var line = gtsStack[i];
+        if ((!gtsTools.isArray(line)) && (!gtsTools.isGts(line))) {
+          console.debug("[gtsTools] isGtsStack false - line " + i + " is neither an Array nor a gts", line);
+          return false;
+        }
+        for (var j=0; j<line.length; j++) {
+          var item = line[j];
+          if (!gtsTools.isGts(item)) {
+            console.debug("[gtsTools] isGtsStack false - item "+i+"-"+j+" isn't GTS", item);
+            return false;
+          }
+        }
+      }
+      return true;
+    };
+
+
+
+    window.gtsTools = gtsTools;
+  }).call(this);
+</script>
