@@ -2,27 +2,22 @@
   (function() {
     var gtsTools = {};
 
-    /***********************************************************************************
-    * Returns true if @value is an Array
-    ***********************************************************************************/
+
+
+
+
+
+    /**
+     * Returns true if @value is an Array
+     */
     gtsTools.isArray = function(value) {
       return value && typeof value === 'object' && value instanceof Array && typeof value.length === 'number'
         && typeof value.splice === 'function' && !(value.propertyIsEnumerable('length'));
     };
 
-    /***********************************************************************************
-    * Returns true if @gts is a valid gts
-    ***********************************************************************************/
-    gtsTools.isGts = function(gts) {
-      if ( gts == null || gts.c == null || gts.l == null || gts.a == null || gts.v == null || !gtsTools.isArray(gts.v) ){
-        return false;
-      }
-      return true;
-    }
-
-    /***********************************************************************************
-    * Returns true if @data is a valid response object
-    ***********************************************************************************/
+    /**
+     * Returns true if @data is a valid response object
+     */
     gtsTools.isValidResponse = function(data) {
 
       var response;
@@ -43,29 +38,90 @@
       return true;
     };
 
+    /**
+     * Returns true if @item is a valid gts
+     */
+    gtsTools.isGts = function(item) {
+      if ( item == null || item.c == null || item.l == null || item.a == null || item.v == null || !gtsTools.isArray(item.v) ){
+        return false;
+      }
+      return true;
+    }
 
-    /***********************************************************************************
-    * Returns true if item of received JSON is an embedded image
-    ***********************************************************************************/
-    gtsTools.isEmbeddedImage = function(gts) {
-      if (typeof gts === !'string' || !/^data:image/.test(gts)) {
+    /**
+     * Returns true if @gts is a valid gts to plot
+     */
+    gtsTools.isGtsToPlot = function(gts) {
+      if ( !gtsTools.isGts(gts) ) {
+        return false;
+      }
+      // We look at the first value, if it's a String or Boolean it's an annotation GTS,
+      // if it's a number it's a GTS to plot
+      if  (typeof(gts.v[0][gts.v[0].length-1]) === 'number' )  {
+        return true;
+      }
+      return false;
+    }
+
+    /**
+     * Returns true if @gts is a valid gts to annotate
+     */
+    gtsTools.isGtsToAnnotate = function(gts) {
+      if ( !gtsTools.isGts(gts) ) {
+        return false;
+      }
+      // We look at the first value, if it's a String or Boolean it's an annotation GTS,
+      // if it's a number it's a GTS to plot
+      if  (typeof(gts.v[0][gts.v[0].length-1]) === 'number' )  {
+        return false;
+      }
+      return true;
+    }
+
+    /**
+     * Returns true if @item is an embedded image
+     *
+     * Embedded image format:
+     *
+     * data:imagepng;base64,dj544fcksdf9DSA234...
+     */
+    gtsTools.isEmbeddedImage = function(item) {
+      if (typeof item === !'string' || !/^data:image/.test(item)) {
         return false;
       }
       return true;
     };
-    /***********************************************************************************
-    * Returns true if item of received JSON is an object with an embedded Image
-    ***********************************************************************************/
-    gtsTools.isEmbeddedImageObject = function(gts) {
-      if ((gts == null) || (gts.image == null) || (gts.caption == null) || !gtsTools.isEmbeddedImage(gts.image)) {
+
+    /**
+     * Returns true if @item is an object with an embedded Image
+     *
+     * Embedded image object format:
+     * { "image": "data:image/base64,png;dj544fcksdf9DSA234...", "caption": "A caption for the image" }
+     */
+    gtsTools.isEmbeddedImageObject = function(item) {
+      if ((item == null) || (item.image == null) || (item.caption == null) || !gtsTools.isEmbeddedImage(item.image)) {
         return false;
       }
       return true;
     };
 
-    /***********************************************************************************
-    * Generates a GTS datapoint from a datapoint of received JSON
-    ***********************************************************************************/
+    /**
+     * Returns true if @item is an array of positions
+     *
+     * Array of postions format
+     * { "positions": [[42.27,2.38],[41.34,2.81],...], "path": false, "marker": "data:image/base64,png;dj544fcksdf9DSA234..." }
+     */
+    gtsTools.isPositionArray = function(item) {
+      if ((item == null) || (item.positions == null) || (item.path == null)) {
+        return false;
+      }
+      return true;
+    }
+
+
+    /**
+     * Generates a GTS datapoint from a datapoint of received JSON
+     */
     gtsTools.metricFromJSON = function(json) {
       var metric;
       metric = {
@@ -89,9 +145,9 @@
       return metric;
     };
 
-    /***********************************************************************************
-    * Generates a GTS stack item from an item of received JSON
-    ***********************************************************************************/
+    /**
+     * Generates a GTS stack item from an item of received JSON
+     */
     gtsTools.gtsFromJSON = function(json, id) {
       var gts, j, len, metric, ref;
       gts = {
@@ -112,9 +168,9 @@
     };
 
 
-    /***********************************************************************************
-    * Generates a GTS stack from the received JSON
-    ***********************************************************************************/
+    /**
+     * Generates a GTS stack from the received JSON
+     */
     gtsTools.gtsFromJSONList = function(jsonList, prefixId) {
       // console.debug("[czd-gts-tools] gtsFromJSONList, jsonList", {list: jsonList});
       var gts, gtsList, i, id;
@@ -155,9 +211,9 @@
       };
     };
 
-    /***********************************************************************************
-    * Flatten a GTS array
-    ***********************************************************************************/
+    /**
+     * Flatten a GTS array
+     */
     gtsTools.flattenGtsIdArray = function(a, r) {
       var elem, j ;
 
@@ -177,9 +233,9 @@
       return r;
     };
 
-    /***********************************************************************************
-    * Generated a serialized version of GTS metadata
-    ***********************************************************************************/
+    /**
+     * Generated a serialized version of GTS metadata
+     */
     gtsTools.serializeGtsMetadata = function(gts) {
       var key, ref, serializedGtsMetadata, value;
       serializedGtsMetadata = gts.id + " " + gts.c + "{";
@@ -192,9 +248,9 @@
       return serializedGtsMetadata += "}";
     };
 
-    /***********************************************************************************
-    * DEPRECATED
-    ***********************************************************************************/
+    /**
+     * DEPRECATED
+     */
     gtsTools.isGtsStack = function(gtsStack) {
 
       if (!gtsTools.isArray(gtsStack)) {
@@ -218,6 +274,36 @@
       return true;
     };
 
+
+    /**
+     * Tranform a gts @gts into path
+     */
+    gtsTools.gtsToPath = function(gts) {
+      var path = [];
+
+      // Sort values
+      gts.v = gts.v.sort(function(a, b) { return a[0] - b[0];});
+
+      for (var i = 0; i < gts.v.length; i++) {
+        var metric = gts.v[i];
+
+        if (metric.length == 2) {
+            // timestamp, value
+        }
+        if (metric.length == 3) {
+            // timestamp, elevation, value
+        }
+        if (metric.length == 4) {
+            // timestamp, lat, lon, value
+            path.push({ ts: Math.floor(metric[0]/1000), lat: metric[1], lon: metric[2], val: metric[3]});
+        }
+        if (metric.length == 5) {
+            // timestamp, lat, lon, elevation, value
+            path.push({ ts: Math.floor(metric[0]/1000), lat: metric[1], lon: metric[2], elev: metric[3], val: metric[4]});
+        }
+      }
+      return path;
+    };
 
 
     window.gtsTools = gtsTools;

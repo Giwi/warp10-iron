@@ -1,5 +1,6 @@
 <link rel="import" href=" ../polymer/polymer.html">
 <link rel="import" href=" ../iron-ajax/iron-ajax.html">
+<link rel="import" href=" ../warp10-iron/warp10-looseJSON.html">
 
 <dom-module name="warp10-warpscript-caller" >
   <template>
@@ -166,9 +167,9 @@
         return;
       }
 
-      if (this.warpscript.length <= 0) {
+      if ((this.warpscript === undefined) || (this.warpscript.length <= 0)) {
         // If we haven't an WarpScript script, we do nothing yet
-        // console.debug("[warp10-warpscript-caller] initCall - no warpscript script", this.warpscript);
+        console.debug("[warp10-warpscript-caller] initCall - no warpscript script", this.warpscript);
         return;
       }
 
