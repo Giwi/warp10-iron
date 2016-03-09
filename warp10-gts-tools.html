@@ -109,16 +109,49 @@
      * Returns true if @item is an array of positions
      *
      * Array of postions format
-     * { "positions": [[42.27,2.38],[41.34,2.81],...], "path": false, "key": "fuel" }
+     * { "positions": [[42.27,2.38],[41.34,2.81],...], "render": 'marker', "key": "fuel" }
      * `key` must be chosen from https://www.mapbox.com/maki/
      */
     gtsTools.isPositionArray = function(item) {
       if ((item == null) || (item.positions == null)) {
         return false;
       }
+      for (var i in item.positions) {
+        if (item.positions[i].length < 2 || item.positions[i].length > 3) {
+          return false;
+        }
+        for (var j in item.positions[i]) {
+          if (typeof item.positions[i][j] != 'number') {
+            return false;
+          }
+        }
+      }
       return true;
     }
 
+    /**
+     * Returns true if @item is an array of positions with values
+     *
+     * Array of postions with values format
+     * { "positions": [[42.27,2.38, 42],[41.34,2.81, 21],...], "render": 'marker', "key": "fuel" }
+     * `key` must be chosen from https://www.mapbox.com/maki/
+     */
+    gtsTools.isPositionsArrayWithValues = function(item) {
+      if ((item == null) || (item.positions == null)) {
+        return false;
+      }
+      for (var i in item.positions) {
+        if (item.positions[i].length != 3) {
+          return false;
+        }
+        for (var j in item.positions[i]) {
+          if (typeof item.positions[i][j] != 'number') {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
 
     /**
      * Generates a GTS datapoint from a datapoint of received JSON
