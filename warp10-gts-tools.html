@@ -109,10 +109,11 @@
      * Returns true if @item is an array of positions
      *
      * Array of postions format
-     * { "positions": [[42.27,2.38],[41.34,2.81],...], "path": false, "marker": "data:image/base64,png;dj544fcksdf9DSA234..." }
+     * { "positions": [[42.27,2.38],[41.34,2.81],...], "path": false, "key": "fuel" }
+     * `key` must be chosen from https://www.mapbox.com/maki/
      */
     gtsTools.isPositionArray = function(item) {
-      if ((item == null) || (item.positions == null) || (item.path == null)) {
+      if ((item == null) || (item.positions == null)) {
         return false;
       }
       return true;
