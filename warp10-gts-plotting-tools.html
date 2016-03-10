@@ -165,7 +165,7 @@
       for (var i=0; i< plottingTools.data.length; i++) {
         // Let's verify if it's a GTS to plot
         console.debug("[czd-plotted-gts] toNvd3Graph - isGtsToPlot", plottingTools.data[i])
-        if (gtsTools.isGtsToPlot(plottingTools.data[i])) {
+        if (plottingTools.isGtsToPlot(plottingTools.data[i])) {
           var sl = plottingTools.data[i];
           sl.color = plottingTools.color[i];
           sl.key = plottingTools.data[i].key;
@@ -190,6 +190,36 @@
 
       return chartData;
     };
+
+
+    plottingTools.isArray = function(value) {
+      return value && typeof value === 'object' && value instanceof Array && typeof value.length === 'number'
+      && typeof value.splice === 'function' && !(value.propertyIsEnumerable('length'));
+    };
+
+    plottingTools.isGts = function(gts) {
+      if ((gts.c == null) || (gts.l == null)
+      || (gts.values == null) || !plottingTools.isArray(gts.values) ) {
+        return false;
+      }
+      return true;
+    }
+
+    plottingTools.isGtsToPlot = function(gts) {
+      if ( !plottingTools.isGts(gts) ) {
+        return false;
+      }
+
+      console.debug("[plottingTools] isGtsToPlot", gts.values[0])
+      // We look at the first value, if it's a String or Boolean it's an annotation GTS,
+      // if it's a number it's a GTS to plot
+      if  (typeof(gts.values[0].y) === 'number' )  {
+        return true;
+      }
+      return false;
+    }
+
+
 
     plottingTools.MIN_TS = 0;
     plottingTools.MAX_TS = Math.pow(2, 53) - 1;
