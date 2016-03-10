@@ -196,7 +196,6 @@
     },
 
     receivedResponse: function(event, ironRequest) {
-      console.debug("[warp10-warpscript-caller] receivedResponse - Updated!", looseJSON.parse(ironRequest.response));
       var elapsedHeader;
       if (this.headerName != null) {
         elapsedHeader = "X-"+this.headerName+"-Elapsed";
@@ -207,6 +206,7 @@
       this.elapsed = ironRequest.xhr.getResponseHeader(elapsedHeader);
       this.error = 0;
       this.data = looseJSON.parse(ironRequest.response);
+      console.debug("[warp10-warpscript-caller] receivedResponse - Updated!", this.data);
       // Desctivate spinner
       this.loading = false;
     },
