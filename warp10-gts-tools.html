@@ -339,6 +339,23 @@
       return path;
     };
 
+    gtsTools.equalMetadata = function (a,b) {
+      if (a.c === undefined || b.c === undefined || a.l === undefined || b.l === undefined || !(a.l instanceof Object) || !(b.l instanceof Object) ) {
+        console.error("[warp10-gts-tools] equalMetadata - Error in GTS, metadata is not well formed");
+        return false;
+      }
+      if (a.c != b.c) {
+        return false;
+      }
+      for ( var p in a.l ) {
+        if ( ! b.l.hasOwnProperty(p) ) return false;
+        if ( a.l[p] != b.l[p] ) return false;
+      }
+      for ( var p in b.l ) {
+        if ( ! a.l.hasOwnProperty(p) ) return false;
+      }
+      return true;
+    }
 
     window.gtsTools = gtsTools;
   }).call(this);

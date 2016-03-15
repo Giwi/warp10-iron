@@ -38,7 +38,7 @@
       if (!plottingTools.isPlotted(gts)) {
         return "";
       }
-      console.debug("[czd-plotted-gts] GTS plotted", gts.id);
+      console.debug("[warp10-gts-plotting-tools] GTS plotted", gts.id);
       var  index = plottingTools.id.indexOf(gts.id);
       return "background-color:"+plottingTools.color[index]+";"
     };
@@ -60,8 +60,8 @@
     };
     plottingTools.add = function(gts) {
       if (!plottingTools.isPlotted(gts)) {
-        // console.debug("[czd-plotted-gts] plottingTools.add() - The GTS " + gts.id + " isn't currently plotted");
-        console.debug("[czd-plotted-gts] plottingTools.add()", gts)
+        // console.debug("[warp10-gts-plotting-tools] plottingTools.add() - The GTS " + gts.id + " isn't currently plotted");
+        console.debug("[warp10-gts-plotting-tools] plottingTools.add()", gts)
         plottingTools.data.push(plottingTools.gtsToNvd3(gts));
         plottingTools.names.push({
           c: gts.c,
@@ -86,42 +86,39 @@
       }
     };
     plottingTools.refresh = function(gtsList) {
-      console.debug("[czd-plotted-gts] plottingTools.refresh()");
+      console.debug("[warp10-gts-plotting-tools] plottingTools.refresh()");
 
       // Variable to see if the GTS shown on graph still exists in new data
       var gtsInPlottedStillExists = []
       for (var index in plottingTools.id){
         gtsInPlottedStillExists.push(false);
       }
-      // console.debug("[czd-plotted-gts] plottingTools.refresh() - gtsInPlottedStillExists", gtsInPlottedStillExists);
+      // console.debug("[warp10-gts-plotting-tools] plottingTools.refresh() - gtsInPlottedStillExists", gtsInPlottedStillExists);
 
       for (var index in gtsList) {
         var gts = gtsList[index];
+
         if (plottingTools.isPlotted(gts)) {
           var i = plottingTools.id.indexOf(gts.id);
-          if (
-            plottingTools.names[i].c == gts.c
-            && plottingTools.names[i].l == gts.l
-            && plottingTools.names[i].id == gts.id
-          ) {
+          if (gtsTools.equalMetadata(plottingTools.names[i], gts)) {
             plottingTools.data[i] = plottingTools.gtsToNvd3(gtsList[index]);
             gtsInPlottedStillExists[i] = true
-            // console.debug("[czd-plotted-gts] plottingTools.refresh() - gts refreshed", i);
+            // console.debug("[warp10-gts-plotting-tools] plottingTools.refresh() - gts refreshed", i);
           }
         }
       }
       for (var index=gtsInPlottedStillExists.length-1; index>=0; index--){
-        // console.debug("[czd-plotted-gts] plottingTools.refresh() - gts verifying", index);
+        // console.debug("[warp10-gts-plotting-tools] plottingTools.refresh() - gts verifying", index);
         if (!gtsInPlottedStillExists[index]) {
-          // console.debug("[czd-plotted-gts] plottingTools.refresh() - gts deleted", index);
+          // console.debug("[warp10-gts-plotting-tools] plottingTools.refresh() - gts deleted", index);
           plottingTools.id.splice(index, 1);
           plottingTools.data.splice(index, 1);
           plottingTools.names.splice(index, 1);
           plottingTools.removeColorIfLast(plottingTools.color[index]);
           plottingTools.color.splice(index, 1);
         }
-        // console.debug("[czd-plotted-gts] plottingTools.refresh() - plottingTools", plottingTools);
       }
+      // console.debug("[warp10-gts-plotting-tools] plottingTools.refresh() - plottingTools", plottingTools.id);
     }
 
 
@@ -153,7 +150,7 @@
          // nvd3Series.values.push({x: new Date(metric[0]/1000), y: metric[metric.length-1]});
         }
       }
-      console.debug("[czd-plotted-gts] gtsToNvd3 ",nvd3Series)
+      console.debug("[warp10-gts-plotting-tools] gtsToNvd3 ",nvd3Series)
       return nvd3Series;
     };
 
@@ -161,17 +158,17 @@
       var chartData = {}
 
       var sparklines = [];
-      console.debug("[czd-plotted-gts] toNvd3Graph", plottingTools.data)
+      console.debug("[warp10-gts-plotting-tools] toNvd3Graph", plottingTools.data)
       for (var i=0; i< plottingTools.data.length; i++) {
         // Let's verify if it's a GTS to plot
-        console.debug("[czd-plotted-gts] toNvd3Graph - isGtsToPlot", plottingTools.data[i])
+        // console.debug("[warp10-gts-plotting-tools] toNvd3Graph - isGtsToPlot", plottingTools.data[i])
         if (plottingTools.isGtsToPlot(plottingTools.data[i])) {
           var sl = plottingTools.data[i];
           sl.color = plottingTools.color[i];
           sl.key = plottingTools.data[i].key;
           sl.area = false;
           sl.interpolate = "step-before";
-          console.debug("[czd-plotted-gts] toNvd3Graph - sl", sl);
+          // console.debug("[warp10-gts-plotting-tools] toNvd3Graph - sl", sl);
           sparklines.push(sl);
         }
       }
@@ -210,7 +207,7 @@
         return false;
       }
 
-      console.debug("[plottingTools] isGtsToPlot", gts.values[0])
+      // console.debug("[plottingTools] isGtsToPlot", gts.values[0])
       // We look at the first value, if it's a String or Boolean it's an annotation GTS,
       // if it's a number it's a GTS to plot
       if  (typeof(gts.values[0].y) === 'number' )  {
@@ -223,14 +220,15 @@
 
     plottingTools.MIN_TS = 0;
     plottingTools.MAX_TS = Math.pow(2, 53) - 1;
+
     plottingTools.getTimeBounds = function(nvd3SeriesList) {
 
-      console.debug("[czd-plotted-gts] getTimeBounds ",nvd3SeriesList)
+      // console.debug("[warp10-gts-plotting-tools] getTimeBounds ",nvd3SeriesList)
 
       var bounds = {}
 
       if (!plottingTools.isArray(nvd3SeriesList)) {
-        console.error("[plottingTools.getTimeBounds] nvd3SeriesList isn't array",nvd3SeriesList);
+        // console.error("[plottingTools.getTimeBounds] nvd3SeriesList isn't array",nvd3SeriesList);
         return bounds;
       }
 
