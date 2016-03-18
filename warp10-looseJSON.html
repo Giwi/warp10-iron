@@ -258,8 +258,10 @@
 
     looseJSON.stringify = function(object) {
 
+      console.debug("[looseJSON] stringify", object);
+
       var json = JSON.stringify(object, function (key, value) {
-        // console.debug("[looseJSON] stringify", value);
+
         if (value !== value) {
           return '__NaN__';
         }
@@ -272,14 +274,18 @@
           return '__-Infinity__';
         }
 
-        if (value instanceof Big ) {
-          console.debug("[looseJSON] stringify - BigInt", value.toString());
-          return value.toString();
+        // The replacer's `value` param is already an String for a BigInt
+        // so we need to use `this[key]` to get the object BigInt
+        if (this[key] instanceof Big ) {
+          var bigIntValue = this[key].toString();
+          console.debug("[looseJSON] stringify - BigInt - ", bigIntValue);
+          return '__BigInt__'+bigIntValue+'__';
         }
 
         return value;
       })
-      .replace(/"__NaN__"/g, 'NaN')
+      .replace(/"__BigInt__([0-9.-]*)__"/g, '$1');
+      .replace(/"__NaN__"/g, 'NaN');
       .replace(/"__Infinity__"/g, 'Infinity')
       .replace(/"__-Infinity__"/g, '-Infinity');
 
