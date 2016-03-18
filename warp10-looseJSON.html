@@ -284,7 +284,7 @@
 
         return value;
       })
-      .replace(/"__BigInt__([0-9.-]*)__"/g, '$1')
+      .replace(/"__BigInt__([0-9.-eE]*)__"/g, '$1')
       .replace(/"__NaN__"/g, 'NaN')
       .replace(/"__Infinity__"/g, 'Infinity')
       .replace(/"__-Infinity__"/g, '-Infinity');
