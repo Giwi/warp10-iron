@@ -165,6 +165,10 @@
         case 2:
           metric.value = json[1];
           break;
+        case 3:
+          metric.alt = json[1];
+          metric.value = json[2];
+          break;
         case 4:
           metric.lat = json[1];
           metric.lon = json[2];
