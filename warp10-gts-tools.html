@@ -116,6 +116,9 @@
       if ((item == null) || (item.positions == null)) {
         return false;
       }
+      if (gtsTools.isPositionsArrayWithValues(item) || gtsTools.isPositionsArrayWithTwoValues(item)) {
+        return true;
+      }
       for (var i in item.positions) {
         if (item.positions[i].length < 2 || item.positions[i].length > 3) {
           return false;
@@ -152,6 +155,31 @@
       }
       return true;
     }
+
+    /**
+     * Returns true if @item is an array of positions with two values
+     *
+     * Array of postions with values format
+     * { "positions": [[42.27,2.38, 42, 25],[41.34,2.81, 21, 50],...], "render": 'marker', "key": "fuel" }
+     * `key` must be chosen from https://www.mapbox.com/maki/
+     */
+    gtsTools.isPositionsArrayWithTwoValues = function(item) {
+      if ((item == null) || (item.positions == null)) {
+        return false;
+      }
+      for (var i in item.positions) {
+        if (item.positions[i].length != 4) {
+          return false;
+        }
+        for (var j in item.positions[i]) {
+          if (typeof item.positions[i][j] != 'number') {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
 
     /**
      * Generates a GTS datapoint from a datapoint of received JSON
