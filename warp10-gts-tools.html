@@ -59,9 +59,8 @@
       // if it's a number it's a GTS to plot
       for (var i = 0; i<gts.v.length; i++) {
         if (gts.v[i][gts.v[i].length-1] !== null) {
-          console.debug("[warp10-iron] isGtsToPlot -  gts.v[i] non null", gts.v[i])
           if  ( typeof(gts.v[i][gts.v[i].length-1]) === 'number' )  {
-            console.debug("[warp10-iron] isGtsToPlot - true ", gts)
+
             return true;
           }
           break;
@@ -80,11 +79,10 @@
 
       // We look at the first non-null value, if it's a String or Boolean it's an annotation GTS,
       // if it's a number it's a GTS to plot
+
       for (var i = 0; i<gts.v.length; i++) {
         if (gts.v[i][gts.v[i].length-1] !== null) {
-          console.debug("[warp10-iron] isGtsToAnnotate - gts.v[i] non null", gts.v[i])
           if  ( typeof(gts.v[i][gts.v[i].length-1]) !== 'number' )  {
-            console.debug("[warp10-iron] isGtsToAnnotate -true  ", gts)
             return true;
           }
           break;
