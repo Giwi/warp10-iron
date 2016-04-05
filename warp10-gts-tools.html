@@ -52,13 +52,20 @@
      * Returns true if @gts is a valid gts to plot
      */
     gtsTools.isGtsToPlot = function(gts) {
-      if ( !gtsTools.isGts(gts) ) {
+      if ( !gtsTools.isGts(gts) || gts.v.length == 0) {
         return false;
       }
-      // We look at the first value, if it's a String or Boolean it's an annotation GTS,
+      // We look at the first non-null value, if it's a String or Boolean it's an annotation GTS,
       // if it's a number it's a GTS to plot
-      if  (typeof(gts.v[0][gts.v[0].length-1]) === 'number' )  {
-        return true;
+      for (var i = 0; i<gts.v.length; i++) {
+        if (gts.v[i][gts.v[i].length-1] !== null) {
+          console.debug("[warp10-iron] isGtsToPlot -  gts.v[i] non null", gts.v[i])
+          if  ( typeof(gts.v[i][gts.v[i].length-1]) === 'number' )  {
+            console.debug("[warp10-iron] isGtsToPlot - true ", gts)
+            return true;
+          }
+          break;
+        }
       }
       return false;
     }
@@ -67,15 +74,23 @@
      * Returns true if @gts is a valid gts to annotate
      */
     gtsTools.isGtsToAnnotate = function(gts) {
-      if ( !gtsTools.isGts(gts) ) {
+      if ( !gtsTools.isGts(gts) || gts.v.length == 0) {
         return false;
       }
-      // We look at the first value, if it's a String or Boolean it's an annotation GTS,
+
+      // We look at the first non-null value, if it's a String or Boolean it's an annotation GTS,
       // if it's a number it's a GTS to plot
-      if  (typeof(gts.v[0][gts.v[0].length-1]) === 'number' )  {
-        return false;
+      for (var i = 0; i<gts.v.length; i++) {
+        if (gts.v[i][gts.v[i].length-1] !== null) {
+          console.debug("[warp10-iron] isGtsToAnnotate - gts.v[i] non null", gts.v[i])
+          if  ( typeof(gts.v[i][gts.v[i].length-1]) !== 'number' )  {
+            console.debug("[warp10-iron] isGtsToAnnotate -true  ", gts)
+            return true;
+          }
+          break;
+        }
       }
-      return true;
+      return false;
     }
 
     /**
