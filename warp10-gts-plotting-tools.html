@@ -38,7 +38,7 @@
       if (!plottingTools.isPlotted(gts)) {
         return "";
       }
-      console.debug("[warp10-gts-plotting-tools] GTS plotted", gts.id);
+      // console.debug("[warp10-gts-plotting-tools] GTS plotted", gts.id);
       var  index = plottingTools.id.indexOf(gts.id);
       return "background-color:"+plottingTools.color[index]+";"
     };
@@ -62,7 +62,7 @@
       if (!plottingTools.isPlotted(gts)) {
         // console.debug("[warp10-gts-plotting-tools] plottingTools.add() - The GTS " + gts.id + " isn't currently plotted");
         console.debug("[warp10-gts-plotting-tools] plottingTools.add()", gts)
-        plottingTools.data.push(plottingTools.gtsToNvd3(gts));
+        plottingTools.data.push(gts);
         plottingTools.names.push({
           c: gts.c,
           l: gts.l,

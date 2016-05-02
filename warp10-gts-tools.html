@@ -48,12 +48,15 @@
      */
     gtsTools.isGtsToPlot = function(gts) {
       if ( !gtsTools.isGts(gts) || gts.v.length == 0) {
+        console.debug("warp10-gts-tools isGtsToPlot false", {isGts: gtsTools.isGts(gts), gts_v_length: gts.v.length } );
         return false;
       }
       // We look at the first non-null value, if it's a String or Boolean it's an annotation GTS,
       // if it's a number it's a GTS to plot
       for (var i = 0; i<gts.v.length; i++) {
         if (gts.v[i][gts.v[i].length-1] !== null) {
+          
+          console.debug("[warp10-gts-tools] isGtsToPlot - First value", gts.v[i][gts.v[i].length-1] );
           if  ( typeof(gts.v[i][gts.v[i].length-1]) === 'number' )  {
 
             return true;
@@ -223,7 +226,7 @@
      * Generates a GTS stack item from an item of received JSON
      */
     gtsTools.gtsFromJSON = function(json, id) {
-      var gts, j, len, metric, ref;
+      var gts, j, len, metric;
       gts = {
         c: json.c,
         l: json.l,
@@ -231,11 +234,14 @@
         v: [],
         id: id
       };
-      ref = json.v;
+      
+      gts.v = json.v;
+      /*            
       for (j = 0; j < json.v.length; j++) {
         metric = json.v[j];
         gts.v.push(gtsTools.metricFromJSON(metric));
       }
+      */
       return {
         gts: gts
       };
