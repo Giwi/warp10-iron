@@ -11,6 +11,7 @@
       }
     </style>
 
+    <h1>{{warpscript}}</h1>
     <iron-ajax
       id="xhr"
       url="{{baseUrl}}"
@@ -119,7 +120,10 @@
         value: null
       }
     },
-    attached: function() {
+    attached: function() {      
+      console.debug("[warp10-warpscript-caller] attached");
+      this._isAttached = true;
+      
 
       // Look for a global conf, and apply if it exists
       if (window.quantumConf !== undefined) {
@@ -128,7 +132,7 @@
         this.execEndpoint = window.quantumConf.execEndpoint;
         this.headerName = window.quantumConf.headerName;
       }
-      console.debug("[warp10-warpscript-caller] headerName", this.headerName);
+      // console.debug("[warp10-warpscript-caller] headerName", this.headerName);
 
 
       // console.debug("[warp10-warpscript-caller] attached");
@@ -136,7 +140,7 @@
     },
     warpscriptChanged: function() {
       // console.debug("[warp10-warpscript-caller] called via warpscriptChanged", this.warpscript);
-      // this.initCall();
+      this.initCall();
     },
     callChanged: function() {
       // console.debug("[warp10-warpscript-caller] called via callChanged");
@@ -169,7 +173,7 @@
 
       if ((this.warpscript === undefined) || (this.warpscript.length <= 0)) {
         // If we haven't an WarpScript script, we do nothing yet
-        console.debug("[warp10-warpscript-caller] initCall - no warpscript script", this.warpscript);
+        // console.debug("[warp10-warpscript-caller] initCall - no warpscript script", this.warpscript);
         return;
       }
 
