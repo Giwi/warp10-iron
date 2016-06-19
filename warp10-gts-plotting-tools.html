@@ -6,7 +6,8 @@
       id: [],
       data: [],
       names: [],
-      color: []
+      color: [],
+      params: []
     };
     plottingTools.isPlotted = function(gts) {
       if (plottingTools.id.indexOf(gts.id) >= 0) {
@@ -40,7 +41,7 @@
       }
       // console.debug("[warp10-gts-plotting-tools] GTS plotted", gts.id);
       var  index = plottingTools.id.indexOf(gts.id);
-      return "background-color:"+plottingTools.color[index]+";"
+      return "background-color:"+plottingTools.params[index].color+";"
     };
     plottingTools.getColor = function(index) {
       return plottingTools.palette[index % plottingTools.maxColors];
@@ -68,7 +69,7 @@
           l: gts.l,
           id: gts.id
         });
-        plottingTools.color.push(plottingTools.nextColor());
+        plottingTools.params.push({color: plottingTools.nextColor()});
         plottingTools.id.push(gts.id);
       }
     };
@@ -80,8 +81,8 @@
           plottingTools.id.splice(index, 1);
           plottingTools.data.splice(index, 1);
           plottingTools.names.splice(index, 1);
-          plottingTools.removeColorIfLast(plottingTools.color[index]);
-          plottingTools.color.splice(index, 1);
+          plottingTools.removeColorIfLast(plottingTools.params[index].color);
+          plottingTools.params.splice(index, 1);
         }
       }
     };
@@ -114,8 +115,8 @@
           plottingTools.id.splice(index, 1);
           plottingTools.data.splice(index, 1);
           plottingTools.names.splice(index, 1);
-          plottingTools.removeColorIfLast(plottingTools.color[index]);
-          plottingTools.color.splice(index, 1);
+          plottingTools.removeColorIfLast(plottingTools.params[index].color);
+          plottingTools.params.splice(index, 1);
         }
       }
       // console.debug("[warp10-gts-plotting-tools] plottingTools.refresh() - plottingTools", plottingTools.id);
@@ -164,7 +165,7 @@
         // console.debug("[warp10-gts-plotting-tools] toNvd3Graph - isGtsToPlot", plottingTools.data[i])
         if (plottingTools.isGtsToPlot(plottingTools.data[i])) {
           var sl = plottingTools.data[i];
-          sl.color = plottingTools.color[i];
+          sl.color = plottingTools.params[i].color;
           sl.key = plottingTools.data[i].key;
           sl.area = false;
           sl.interpolate = "step-before";
