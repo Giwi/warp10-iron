@@ -199,12 +199,14 @@
     },
 
     receivedResponse: function(event, ironRequest) {
-      var elapsedHeader;
-      if (this.headerName != null) {
-        elapsedHeader = "X-"+this.headerName+"-Elapsed";
-      }
-      else {
-         elapsedHeader = "X-Warp10-Elapsed";
+      var allowerHeaders =  ironRequest.xhr.getAllResponseHeaders().split(',').map(function(i){ return i.split(':')[0].trim(); });
+      console.debug("[warp10-warpscript-caller] receivedResponse - ", allowerHeaders);
+      
+      var elapsedHeader = "X-Warp10-Elapsed";
+      for (var i in allowerHeaders) {
+        if (allowerHeaders[i].match('Elapsed')) {
+          elapsedHeader = allowerHeaders[i];
+        }
       }
       this.elapsed = ironRequest.xhr.getResponseHeader(elapsedHeader);
       this.error = 0;
