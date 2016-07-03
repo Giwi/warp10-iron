@@ -252,7 +252,7 @@
      * Generates a GTS stack from the received JSON
      */
     gtsTools.gtsFromJSONList = function(jsonList, prefixId) {
-      // console.debug("[czd-gts-tools] gtsFromJSONList, jsonList", {list: jsonList});
+      console.debug("[czd-gts-tools] gtsFromJSONList, jsonList", {list: jsonList});
       var gts, gtsList, i, id;
       gtsList = [];
       for (i = 0;  i < jsonList.length; i++) {
@@ -283,7 +283,7 @@
             id: id
           });
         }
-        // console.debug("[czd-gts-tools] gtsFromJSONList, gtsList ", gtsList);
+        console.debug("[czd-gts-tools] gtsFromJSONList, gtsList ", gtsList);
 
       }
       return {
