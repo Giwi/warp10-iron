@@ -204,6 +204,7 @@
       return ironRequest.xhr.getResponseHeader(elapsedHeader);      
     },
     _handleResponse: function(event, ironRequest) {
+      event.stopPropagation();
       var elapsed = this._getElapsed(ironRequest);      
       var stack = looseJSON.parse(ironRequest.response);
       
