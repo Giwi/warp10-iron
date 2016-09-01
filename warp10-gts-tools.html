@@ -48,7 +48,7 @@
      */
     gtsTools.isGtsToPlot = function(gts) {
       if ( !gtsTools.isGts(gts) || gts.v.length == 0) {
-        console.debug("warp10-gts-tools isGtsToPlot false", {isGts: gtsTools.isGts(gts), gts_v_length: gts.v?gts.v.length:0 } );
+        // console.debug("warp10-gts-tools isGtsToPlot false", {isGts: gtsTools.isGts(gts), gts_v_length: gts.v?gts.v.length:0 } );
         return false;
       }
       // We look at the first non-null value, if it's a String or Boolean it's an annotation GTS,
