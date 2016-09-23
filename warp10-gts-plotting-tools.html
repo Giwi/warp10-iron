@@ -87,14 +87,14 @@
       }
     };
     plottingTools.refresh = function(gtsList) {
-      console.debug("[warp10-gts-plotting-tools] plottingTools.refresh()");
+      console.debug("[warp10-gts-plotting-tools] plottingTools.refresh()", gtsList);
 
       // Variable to see if the GTS shown on graph still exists in new data
       var gtsInPlottedStillExists = []
       for (var index in plottingTools.id){
         gtsInPlottedStillExists.push(false);
       }
-      // console.debug("[warp10-gts-plotting-tools] plottingTools.refresh() - gtsInPlottedStillExists", gtsInPlottedStillExists);
+      console.debug("[warp10-gts-plotting-tools] plottingTools.refresh() - gtsInPlottedStillExists", gtsInPlottedStillExists);
 
       for (var index in gtsList) {
         var gts = gtsList[index];
@@ -102,7 +102,6 @@
         if (plottingTools.isPlotted(gts)) {
           var i = plottingTools.id.indexOf(gts.id);
           if (gtsTools.equalMetadata(plottingTools.names[i], gts)) {
-            // plottingTools.data[i] = plottingTools.gtsToNvd3(gtsList[index]);
             plottingTools.data[i] = gtsList[index];
             gtsInPlottedStillExists[i] = true
             // console.debug("[warp10-gts-plotting-tools] plottingTools.refresh() - gts refreshed", i);
@@ -120,7 +119,7 @@
           plottingTools.params.splice(index, 1);
         }
       }
-      console.debug("[warp10-gts-plotting-tools] plottingTools.refresh() - plottingTools", plottingTools.id);
+      console.debug("[warp10-gts-plotting-tools] plottingTools.refresh() - plottingTools", plottingTools);
     }
 
 

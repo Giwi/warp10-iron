@@ -148,7 +148,8 @@
       // console.debug("[warp10-warpscript-caller] generateRequest - WarpScript script", this.warpscript);
       if (this.reload > 0) {
         // If `reload > 0` set reloading interval and call, else call directly
-        this.reloadInterval = parseFloat(this.reload)*1000;
+        this._reloadInterval = parseFloat(this.reload)*1000;
+        // console.debug("[warp10-warpscript-caller] generateRequest - Reload interval in ms", this._reloadInterval);
         this._doCallWithReload();
       } else {
         this._doCall();
@@ -173,9 +174,9 @@
        
     },
     _doCallWithReload: function() {
-      // console.debug("[warp10-warpscript-caller] doReload called with interval "+this.reloadInterval+" ms");
+      console.debug("[warp10-warpscript-caller] _doCallWithReload called with interval "+this._reloadInterval+" ms");
       this._doCall();
-      this.async(this.doCallWithReload, this.reloadInterval);
+      this.async(this._doCallWithReload, this._reloadInterval);
     },
 
 
