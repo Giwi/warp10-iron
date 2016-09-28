@@ -179,25 +179,50 @@
       this.async(this._doCallWithReload, this._reloadInterval);
     },
 
-
     _getElapsed: function(ironRequest) {
         var allowerHeaders =  ironRequest.xhr.getAllResponseHeaders().split(',').map(function(i){ return i.split(':')[0].trim(); });
       // console.debug("[warp10-warpscript-caller] _getElapsed - allowerHeaders", allowerHeaders);
       
       var elapsedHeader = "X-Warp10-Elapsed";
       for (var i in allowerHeaders) {
-        if (allowerHeaders[i].match('Elapsed')) {
+        if (allowerHeaders[i].match('-Elapsed')) {
           elapsedHeader = allowerHeaders[i];
         }
       }
       return ironRequest.xhr.getResponseHeader(elapsedHeader);      
     },
+    _getFetched: function(ironRequest) {
+        var allowerHeaders =  ironRequest.xhr.getAllResponseHeaders().split(',').map(function(i){ return i.split(':')[0].trim(); });
+      // console.debug("[warp10-warpscript-caller] _getFetched - allowerHeaders", allowerHeaders);
+      
+      var fetchedHeader = "X-Warp10-Fetched";
+      for (var i in allowerHeaders) {
+        if (allowerHeaders[i].match('-Fetched')) {
+          fetchedHeader = allowerHeaders[i];
+        }
+      }
+      return ironRequest.xhr.getResponseHeader(fetchedHeader);      
+    },    
+    _getOperations: function(ironRequest) {
+        var allowerHeaders =  ironRequest.xhr.getAllResponseHeaders().split(',').map(function(i){ return i.split(':')[0].trim(); });
+      // console.debug("[warp10-warpscript-caller] _getOperations - allowerHeaders", allowerHeaders);
+      
+      var operationsHeader = "X-Warp10-Ops";
+      for (var i in allowerHeaders) {
+        if (allowerHeaders[i].match('-Ops')) {
+          operationsHeader = allowerHeaders[i];
+        }
+      }
+      return ironRequest.xhr.getResponseHeader(operationsHeader);      
+    },
     _handleResponse: function(event, ironRequest) {
       event.stopPropagation();
-      var elapsed = this._getElapsed(ironRequest);      
+      var elapsed = this._getElapsed(ironRequest);    
+      var fetched = this._getFetched(ironRequest);    
+      var operations = this._getOperations(ironRequest); 
       var stack = looseJSON.parse(ironRequest.response);
       
-      var response = {stack: stack, options: { elapsed: elapsed } }; 
+      var response = {stack: stack, options: { elapsed: elapsed, fetched: fetched, operations: operations } }; 
             
       this.lastResponse = response; 
       
