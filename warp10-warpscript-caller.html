@@ -180,7 +180,7 @@
     },
 
     _getElapsed: function(ironRequest) {
-        var allowerHeaders =  ironRequest.xhr.getAllResponseHeaders().split(',').map(function(i){ return i.split(':')[0].trim(); });
+      var allowerHeaders =  ironRequest.xhr.getAllResponseHeaders().split('\n').map(function(i){ return i.split(':')[0].trim(); });
       // console.debug("[warp10-warpscript-caller] _getElapsed - allowerHeaders", allowerHeaders);
       
       var elapsedHeader = "X-Warp10-Elapsed";
@@ -192,7 +192,7 @@
       return ironRequest.xhr.getResponseHeader(elapsedHeader);      
     },
     _getFetched: function(ironRequest) {
-        var allowerHeaders =  ironRequest.xhr.getAllResponseHeaders().split(',').map(function(i){ return i.split(':')[0].trim(); });
+      var allowerHeaders =  ironRequest.xhr.getAllResponseHeaders().split('\n').map(function(i){ return i.split(':')[0].trim(); });
       // console.debug("[warp10-warpscript-caller] _getFetched - allowerHeaders", allowerHeaders);
       
       var fetchedHeader = "X-Warp10-Fetched";
@@ -204,7 +204,7 @@
       return ironRequest.xhr.getResponseHeader(fetchedHeader);      
     },    
     _getOperations: function(ironRequest) {
-        var allowerHeaders =  ironRequest.xhr.getAllResponseHeaders().split(',').map(function(i){ return i.split(':')[0].trim(); });
+      var allowerHeaders =  ironRequest.xhr.getAllResponseHeaders().split('\n').map(function(i){ return i.split(':')[0].trim(); });
       // console.debug("[warp10-warpscript-caller] _getOperations - allowerHeaders", allowerHeaders);
       
       var operationsHeader = "X-Warp10-Ops";
@@ -214,6 +214,30 @@
         }
       }
       return ironRequest.xhr.getResponseHeader(operationsHeader);      
+    },    
+    _getErrorLine: function(ironRequest) {
+      var allowerHeaders =  ironRequest.xhr.getAllResponseHeaders().split('\n').map(function(i){ return i.split(':')[0].trim(); });
+      // console.debug("[warp10-warpscript-caller] _getErrorLine - ironRequest.xhr.getAllResponseHeaders()", ironRequest.xhr.getAllResponseHeaders());
+      
+      var errorLineHeader = "X-Warp10-Error-Line";
+      for (var i in allowerHeaders) {
+        if (allowerHeaders[i].match('-Error-Line')) {
+          errorLineHeader = allowerHeaders[i];
+        }
+      }
+      return ironRequest.xhr.getResponseHeader(errorLineHeader);      
+    },
+    _getErrorMsg: function(ironRequest) {
+        var allowerHeaders =  ironRequest.xhr.getAllResponseHeaders().split('\n').map(function(i){ return i.split(':')[0].trim(); });
+      // console.debug("[warp10-warpscript-caller] _getOperations - allowerHeaders", allowerHeaders);
+      
+      var errorMsgHeader = "X-Warp10-Error-Message";
+      for (var i in allowerHeaders) {
+        if (allowerHeaders[i].match('-Error-Message')) {
+          errorMsgHeader = allowerHeaders[i];
+        }
+      }
+      return ironRequest.xhr.getResponseHeader(errorMsgHeader);      
     },
     _handleResponse: function(event, ironRequest) {
       event.stopPropagation();
@@ -231,10 +255,13 @@
       this.fire('response',response, {bubbles: false});
     },
     _handleError: function(event, error) {      
-      error.elapsed = this._getElapsed(error.request);   
+      error.elapsed = this._getElapsed(error.request);
+      error.fetched = this._getFetched(error.request);    
+      error.operations = this._getOperations(error.request);
+
+      error.line =  this._getErrorLine(error.request);  
+      error.Msg =  this._getErrorMsg(error.request);
       this.fire('error', error,  {bubbles: false});
-      
-      
     },
 
   })
