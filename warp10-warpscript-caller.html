@@ -259,8 +259,8 @@
       error.fetched = this._getFetched(error.request);    
       error.operations = this._getOperations(error.request);
 
-      error.line =  this._getErrorLine(error.request);  
-      error.Msg =  this._getErrorMsg(error.request);
+      error.errorLine =  this._getErrorLine(error.request);  
+      error.errorMsg =  this._getErrorMsg(error.request);
       this.fire('error', error,  {bubbles: false});
     },
 
