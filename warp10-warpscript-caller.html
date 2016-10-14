@@ -141,6 +141,17 @@
       '_optionsChanged(url, warpscript, reload, auto)'
     ],
 
+    // *****************************************************
+    // Lifecycle
+    // *****************************************************
+    detached: function() {
+      console.debug("[warp10-warpscript-caller] detached");
+      if (this._asyncTaskId) {
+        this.cancelAsync(this._asyncTaskId);
+      }
+      
+    },
+
     /**
      * Performs an AJAX request to the specified URL with the WarpScript payload     
      */
@@ -176,7 +187,7 @@
     _doCallWithReload: function() {
       console.debug("[warp10-warpscript-caller] _doCallWithReload called with interval "+this._reloadInterval+" ms");
       this._doCall();
-      this.async(this._doCallWithReload, this._reloadInterval);
+      this._asyncTaskId = this.async(this._doCallWithReload, this._reloadInterval);
     },
 
     _getElapsed: function(ironRequest) {
