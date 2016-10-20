@@ -27,8 +27,7 @@
     "iron-overlay-behavior": "^1.8.0",
     "iron-ajax": "^1.4.0",
     "iron-validator-behavior": "^1.0.0",
-    "big.js": "~3.1.0",
-    "bootstrap": "~3.3.0"
+    "big.js": "~3.1.0"
   },
   "devDependencies": {
   }
