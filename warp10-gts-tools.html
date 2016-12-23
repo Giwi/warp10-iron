@@ -1,3 +1,5 @@
+<link rel="import" href=" ./warp10-looseJSON.html">
+
 <script>
   (function() {
     var gtsTools = {};
@@ -18,7 +20,7 @@
       var response;
 
       try {
-        response = JSON.parse(data);
+        response = looseJSON.parse(data);
         //console.debug(response)
       } catch(e){
         console.error("Response non JSON compliant",data);
@@ -33,61 +35,7 @@
       return true;
     };
 
-    /**
-     * Returns true if @item is a valid gts
-     */
-    gtsTools.isGts = function(item) {
-      if ( item == null || item.c == null || item.l == null || item.a == null || item.v == null || !gtsTools.isArray(item.v) ){
-        return false;
-      }
-      return true;
-    }
 
-    /**
-     * Returns true if @gts is a valid gts to plot
-     */
-    gtsTools.isGtsToPlot = function(gts) {
-      if ( !gtsTools.isGts(gts) || gts.v.length == 0) {
-        // console.debug("warp10-gts-tools isGtsToPlot false", {isGts: gtsTools.isGts(gts), gts_v_length: gts.v?gts.v.length:0 } );
-        return false;
-      }
-      // We look at the first non-null value, if it's a String or Boolean it's an annotation GTS,
-      // if it's a number it's a GTS to plot
-      for (var i = 0; i<gts.v.length; i++) {
-        if (gts.v[i][gts.v[i].length-1] !== null) {
-          
-          console.debug("[warp10-gts-tools] isGtsToPlot - First value", gts.v[i][gts.v[i].length-1] );
-          if  ( typeof(gts.v[i][gts.v[i].length-1]) === 'number' )  {
-
-            return true;
-          }
-          break;
-        }
-      }
-      return false;
-    }
-
-    /**
-     * Returns true if @gts is a valid gts to annotate
-     */
-    gtsTools.isGtsToAnnotate = function(gts) {
-      if ( !gtsTools.isGts(gts) || gts.v.length == 0) {
-        return false;
-      }
-
-      // We look at the first non-null value, if it's a String or Boolean it's an annotation GTS,
-      // if it's a number it's a GTS to plot
-
-      for (var i = 0; i<gts.v.length; i++) {
-        if (gts.v[i][gts.v[i].length-1] !== null) {
-          if  ( typeof(gts.v[i][gts.v[i].length-1]) !== 'number' )  {
-            return true;
-          }
-          break;
-        }
-      }
-      return false;
-    }
 
     /**
      * Returns true if @item is an embedded image
@@ -328,35 +276,14 @@
       return serializedGtsMetadata += "}";
     };
 
-    /**
-     * DEPRECATED
-     */
-    gtsTools.isGtsStack = function(gtsStack) {
 
-      if (!gtsTools.isArray(gtsStack)) {
-        console.debug("[gtsTools] isGtsStack false - not an Array", gtsStack);
-        return false;
-      }
-      for (var i=0; i<gtsStack.length; i++) {
-        var line = gtsStack[i];
-        if ((!gtsTools.isArray(line)) && (!gtsTools.isGts(line))) {
-          console.debug("[gtsTools] isGtsStack false - line " + i + " is neither an Array nor a gts", line);
-          return false;
-        }
-        for (var j=0; j<line.length; j++) {
-          var item = line[j];
-          if (!gtsTools.isGts(item)) {
-            console.debug("[gtsTools] isGtsStack false - item "+i+"-"+j+" isn't GTS", item);
-            return false;
-          }
-        }
-      }
-      return true;
-    };
+
+
 
 
     /**
      * Tranform a gts @gts into path
+     * @notNeededWithTS
      */
     gtsTools.gtsToPath = function(gts) {
       var path = [];
@@ -385,6 +312,10 @@
       return path;
     };
 
+    /**
+    * Returns true if the two GTS have the same metadata
+    * @alreadyInTS
+    */
     gtsTools.equalMetadata = function (a,b) {
       if (a.c === undefined || b.c === undefined || a.l === undefined || b.l === undefined || !(a.l instanceof Object) || !(b.l instanceof Object) ) {
         console.error("[warp10-gts-tools] equalMetadata - Error in GTS, metadata is not well formed");
@@ -402,6 +333,89 @@
       }
       return true;
     }
+
+    /**
+     * Returns true if @item is a valid gts
+     * @alreadyInTS
+     */
+    gtsTools.isGts = function(item) {
+      if ( item == null || item.c == null || item.l == null || item.a == null || item.v == null || !gtsTools.isArray(item.v) ){
+        return false;
+      }
+      return true;
+    }
+
+    /**
+     * Returns true if @gts is a valid gts to plot
+     * @alreadyInTS
+     */
+    gtsTools.isGtsToPlot = function(gts) {
+      if ( !gtsTools.isGts(gts) || gts.v.length == 0) {
+        // console.debug("warp10-gts-tools isGtsToPlot false", {isGts: gtsTools.isGts(gts), gts_v_length: gts.v?gts.v.length:0 } );
+        return false;
+      }
+      // We look at the first non-null value, if it's a String or Boolean it's an annotation GTS,
+      // if it's a number it's a GTS to plot
+      for (var i = 0; i<gts.v.length; i++) {
+        if (gts.v[i][gts.v[i].length-1] !== null) {
+          
+          console.debug("[warp10-gts-tools] isGtsToPlot - First value", gts.v[i][gts.v[i].length-1] );
+          if  ( typeof(gts.v[i][gts.v[i].length-1]) === 'number' )  {
+            return true;
+          }
+          break;
+        }
+      }
+      return false;
+    }
+
+    /**
+     * Returns true if @gts is a valid gts to annotate
+     * @alreadyInTS
+     */
+    gtsTools.isGtsToAnnotate = function(gts) {
+      if ( !gtsTools.isGts(gts) || gts.v.length == 0) {
+        return false;
+      }
+
+      // We look at the first non-null value, if it's a String or Boolean it's an annotation GTS,
+      // if it's a number it's a GTS to plot
+
+      for (var i = 0; i<gts.v.length; i++) {
+        if (gts.v[i][gts.v[i].length-1] !== null) {
+          if  ( typeof(gts.v[i][gts.v[i].length-1]) !== 'number' )  {
+            return true;
+          }
+          break;
+        }
+      }
+      return false;
+    }
+
+    /**
+     * Sorts the GTS
+     * @alreadyInTS
+     */
+    gtsTools.gtsSort = function(gts) {
+      if (gts.isSorted) {
+        return;
+      }
+      // console.debug("[warp10-gts-tools] gtsSort ", gts);
+      gts.v = gts.v.sort(function(a, b) { return a[0] - b[0];});
+      gts.isSorted = true;
+    }
+
+    /**
+     * Gives the time range of the GTS.
+     * If the GTS isn't sorted, it sorts it
+     * @alreadyInTS
+     */
+    gtsTools.gtsTimeRange = function(gts) {
+      gtsTools.gtsSort(gts);
+      // console.debug("[warp10-gts-tools] gtsTimeRange ", [ gts.v[0][0], gts.v[gts.v.length-1][0]]);
+      return [ gts.v[0][0], gts.v[gts.v.length-1][0]];
+    } 
+
 
     window.gtsTools = gtsTools;
   }).call(this);
