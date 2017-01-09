@@ -44,7 +44,7 @@
     };
 
     function requestGathererResponse(evt) {
-      if (!evt.detail || !evt.detail.interval) {
+      if (!evt.detail || !evt.detail.interval || !evt.detail.response || !evt.detail.response.stack || !evt.detail.response.stack[0]) {
         return;
       }
       console.debug("[warp10-warpscript-request-gatherer] requestGathererResponse \n", {
@@ -102,7 +102,7 @@
       observers: [
         "paramsChanged(name, warpscript)"
       ],
-      
+
       //***********************************************************************
       // Observers
       //***********************************************************************
