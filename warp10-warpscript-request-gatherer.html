@@ -1,0 +1,170 @@
+<!--
+@author Horacio Gonzalez (@lostinbrittany)
+@copyright (c) 2017 Cityzen Data
+@license Apache 2.0
+-->
+<link rel="import" href=" ../polymer/polymer.html">
+
+<script>
+  (function() {
+
+    // private sender
+    var sender;
+
+    // private shared database
+    var subscribers = {};
+
+    var proxifiedWarpscript = {};
+
+    function generateWarpscript(interval) {
+      var warpscript = "{} '__result' STORE \n" +
+        "<% '__name' STORE DEPTH ->LIST '__stack' STORE $__result $__stack $__name PUT '__name' STORE %> '__stack2map' STORE \n";
+      var beginMacro = "<%\n  SAVE '__context' STORE \n";
+      var endMacro = "\n  $__context RESTORE\n%> ";
+      for (var i in subscribers[interval]) {
+        var s = subscribers[interval][i];
+        var name = s.name + "_" + i;
+        warpscript +=
+          beginMacro + s.warpscript + endMacro +
+          "'" + name + "' STORE\n" +
+          "@" + name + " '" + name + "' @__stack2map\n";
+      }
+      warpscript += "$__result";
+      console.debug("[warp10-warpscript-request-gatherer] generateWarpscript \n", warpscript);
+      proxifiedWarpscript[interval] = warpscript;
+      console.debug("[warp10-warpscript-request-gatherer] generateWarpscript \n", proxifiedWarpscript);
+
+      var event = new CustomEvent('warpscript-request-gatherer', {
+        detail: {
+          interval: interval,
+          warpscript: warpscript
+        }
+      });
+      document.dispatchEvent(event);
+    };
+
+    function requestGathererResponse(evt) {
+      if (!evt.detail || !evt.detail.interval) {
+        return;
+      }
+      console.debug("[warp10-warpscript-request-gatherer] requestGathererResponse \n", {
+        interval: evt.detail.interval,
+        response: evt.detail.response
+      });
+
+      for (var i in subscribers[evt.detail.interval]) {
+        var s = subscribers[evt.detail.interval][i];
+        var name = s.name + "_" + i;
+        var event = new CustomEvent("response", {
+          detail: evt.detail.response.stack[0][name]
+        });
+        // console.debug("[warp10-warpscript-request-gatherer] requestGathererResponse", event.detail);
+        s.dispatchEvent(event);
+      }
+    }
+    document.addEventListener("warpscript-request-gatherer-response", requestGathererResponse);
+
+    Polymer({
+      is: "warp10-warpscript-request-gatherer",
+
+      properties: {
+        /**
+         * The name  of the element using this instance de proxy
+         */
+        name: {
+          type: String,
+          value: "",
+        },
+        /**
+         * The warscript for the element using this instance de proxy
+         */
+        warpscript: {
+          type: String,
+          value: "",
+        },
+        /**
+         * If `interval`  > 0` it's the number of seconds between two calls
+         * to the WarpScript server.
+         */
+        interval: {
+          type: Number,
+          value: 0,
+          observer: "intervalChanged"
+        },
+        /**
+         *  If `role` == "sender", the parent element isn't registered,
+         */
+        role: {
+          type: String,
+          value: "gatherer"
+        }
+      },
+      observers: [
+        "paramsChanged(name, warpscript)"
+      ],
+      
+      //***********************************************************************
+      // Observers
+      //***********************************************************************
+      intervalChanged: function(newInterval, oldInterval) {
+        if (!this.isAttached) {
+          return;
+        }
+        console.debug("[warp10-warpscript-request-gatherer] intervalChanged - new: ", newInterval, ", old: " + oldInterval);
+        this.unregister(oldInterval);
+        this.register(newInterval);
+        generateWarpscript(this.interval);
+      },
+      paramsChanged: function() {
+        if (!this.isAttached) {
+          return;
+        }
+        console.debug("[warp10-warpscript-request-gatherer] paramsChanged \n", this.name);
+        generateWarpscript(this.interval);
+      },
+
+      //***********************************************************************
+      // Lifecycle methods
+      //***********************************************************************
+      attached: function() {
+        console.debug("[warp10-warpscript-request-gatherer] attached \n", this.name);
+        this.register(this.interval);
+        this.isAttached = true;
+        generateWarpscript(this.interval);
+      },
+      detached: function() {
+        this.unregister(this.interval)
+        this.isAttached = false;
+        generateWarpscript();
+        console.debug("[warp10-warpscript-request-gatherer] dettached \n", this.name);
+      },
+
+      //***********************************************************************
+      // Other methods
+      //***********************************************************************
+      register: function(interval) {
+        if (!subscribers[interval]) {
+          subscribers[interval] = [];
+        }
+        if (subscribers[interval].indexOf(this) < 0) {
+          console.debug("[warp10-warpscript-request-gatherer] register - Registering instance", this);
+          subscribers[interval].push(this);
+        } else {
+          console.warn("[warp10-warpscript-request-gatherer] register - Instance already registered", this);
+        }
+      },
+      unregister: function(interval) {
+        var i = subscribers[interval].indexOf(this);
+        if (i >= 0) {
+          console.debug("[warp10-warpscript-request-gatherer] unregister - Unregistering instance", this);
+          subscribers[this.interval].splice(i, 1);
+        }
+      },
+
+    });
+
+
+
+
+  })();
+</script>

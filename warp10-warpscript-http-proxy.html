@@ -1,0 +1,112 @@
+<!--
+@author Horacio Gonzalez (@lostinbrittany)
+@copyright (c) 2016 Cityzen Data
+@license Apache 2.0
+-->
+<link rel="import" href=" ../polymer/polymer.html">
+
+<link rel="import" href=" ./warp10-warpscript-caller.html">
+
+<dom-module name="warp10-warpscript-http-proxy">
+
+  <template>
+    <style>
+      :host {
+        display: none;
+      }
+    </style>
+
+    <warp10-warpscript-caller
+        url="[[url]]"
+        warpscript="[[_warpscript]]"
+        reload="[[interval]]"
+        on-response="_handleResponse"
+        auto></warp10-warpscript-caller>
+  </template>
+  <script>
+    var evtListener =
+      Polymer({
+        is: "warp10-warpscript-http-proxy",
+        properties: {
+          /**
+           * URL of WarpScript platform
+           */
+          url: {
+            type: String,
+            value: ""
+          },
+
+          /**
+           * WarpScript script to execute
+           */
+          warpscript: {
+            type: String,
+            value: ""
+          },
+
+          /**
+           * If `interval`  > 0` it's the number of seconds between two calls
+           * to the WarpScript server.
+           */
+          interval: {
+            type: Number,
+            value: 0,
+          },
+
+          /**
+           * Presets to pre-append to the scripts
+           */
+          presets: {
+            type: String,
+            value: "",
+          },
+
+          _warpscript: {
+            type: String,
+            computed: "_appendPresets(warpscript,presets)"
+          },
+        },
+
+        //***********************************************************************
+        // Lifecycle methods
+        //***********************************************************************
+        attached: function() {
+          var context = this;
+
+          this.evtListener = function(evt) {
+            console.debug("[warp10-warpscript-http-proxy] - evtListener", context);
+            if (evt.detail.interval == context.interval) {
+              context.warpscript = evt.detail.warpscript;
+            }
+          }
+          document.addEventListener("warpscript-request-gatherer", this.evtListener);
+        },
+
+        detached: function() {
+          document.removeEventListener("warpscript-request-gatherer", this.evtListener);
+        },
+
+        //***********************************************************************
+        // Event listeners
+        //***********************************************************************
+        _handleResponse: function(evt, response) {
+          var event = new CustomEvent("warpscript-request-gatherer-response", {
+            detail: {
+              interval: this.interval,
+              response: response
+            }
+          });
+          // console.debug("[warp10-warpscript-http-proxy] - _handleResponse", event);
+          document.dispatchEvent(event);
+        },
+
+        //***********************************************************************
+        // Other methods
+        //***********************************************************************
+        _appendPresets: function() {
+          return this.presets+"\n CLEAR \n"+this.warpscript;
+        },
+
+      });
+  </script>
+</dom-module>
