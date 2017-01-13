@@ -12,14 +12,10 @@
     /*
     // TypeScript definitions of the structures
     interface subscribers {
-      [proxy: String]: {
-        [interval: Number] : warp10-warpscript-request-gatherer[]
-      }
+      [proxy: String]: warp10-warpscript-request-gatherer[]
     }
     interface proxifiedWarpscript {
-      [proxy: String]: {
-        [interval: Number] : String
-      }
+      [proxy: String]:  String
     }
     */
     var subscribers = {};
@@ -29,13 +25,13 @@
      * Concatenates all the Warpscript calls from all the attached instance sharing the same calling interval \
      * in a coherent Warpscript script and then sends an event for the warpscript proxy
      */
-    function generateWarpscript(proxy, interval) {
+    function generateWarpscript(proxy) {
       var warpscript = "{} '__result' STORE \n" +
         "<% '__name' STORE DEPTH ->LIST '__stack' STORE $__result $__stack $__name PUT '__name' STORE %> '__stack2map' STORE \n";
       var beginMacro = "<%\n  SAVE '__context' STORE \n";
       var endMacro = "\n  $__context RESTORE\n%> ";
-      for (var i in subscribers[proxy][interval]) {
-        var s = subscribers[proxy][interval][i];
+      for (var i in subscribers[proxy]) {
+        var s = subscribers[proxy][i];
         var name = s.name + "_" + i;
         warpscript +=
           beginMacro + s.warpscript + endMacro +
@@ -47,12 +43,12 @@
       if (!proxifiedWarpscript[proxy]) {
           proxifiedWarpscript[proxy] = {};
       }
-      proxifiedWarpscript[proxy][interval] = warpscript;
+      proxifiedWarpscript[proxy] = warpscript;
       console.debug("[warp10-warpscript-request-gatherer] generateWarpscript \n", proxifiedWarpscript);
 
       var event = new CustomEvent("request-gathered-for-"+proxy, {
         detail: {
-          interval: interval,
+          proxy: proxy,
           warpscript: warpscript
         }
       });
@@ -64,25 +60,22 @@
      * attached instance sharing the interval
      */
     function requestGathererResponse(evt) {
-      if (!evt.detail || !evt.detail.interval || !evt.detail.response || !evt.detail.response.stack || !evt.detail.response.stack[0]) {
+      if (!evt.detail || !evt.detail.response || !evt.detail.response.stack || !evt.detail.response.stack[0]) {
         return;
       }
       console.debug("[warp10-warpscript-request-gatherer] requestGathererResponse \n", {
         proxy: evt.detail.proxy,
-        interval: evt.detail.interval,
         response: evt.detail.response
       });
 
-      if (subscribers[evt.detail.proxy]) {
-        for (var i in subscribers[evt.detail.proxy][evt.detail.interval]) {
-          var s = subscribers[evt.detail.proxy][evt.detail.interval][i];
-          var name = s.name + "_" + i;
-          var event = new CustomEvent("response", {
-            detail: evt.detail.response.stack[0][name]
-          });
-          // console.debug("[warp10-warpscript-request-gatherer] requestGathererResponse", event.detail);
-          s.dispatchEvent(event);
-        }
+      for (var i in subscribers[evt.detail.proxy]) {
+        var s = subscribers[evt.detail.proxy][i];
+        var name = s.name + "_" + i;
+        var event = new CustomEvent("response", {
+          detail: evt.detail.response.stack[0][name]
+        });
+        // console.debug("[warp10-warpscript-request-gatherer] requestGathererResponse", event.detail);
+        s.dispatchEvent(event);
       }
     };
 
@@ -108,15 +101,6 @@
           value: "",
         },
         /**
-         * If `interval`  > 0` it's the number of seconds between two calls
-         * to the WarpScript server.
-         */
-        interval: {
-          type: Number,
-          value: 0,
-          observer: "intervalChanged",
-        },
-        /**
          *  The name of the proxy used for this warpscript
          */
         proxy: {
@@ -137,25 +121,16 @@
           return;
         }
         console.debug("[warp10-warpscript-request-gatherer] proxyChanged - new: ", newProxy, ", old: " + oldProxy);
-        this.unregister(oldProxy, this.interval);
-        this.register(newProxy, this.interval);
-        generateWarpscript(newProxy, this.interval);
-      },
-      intervalChanged: function(newInterval, oldInterval) {
-        if (!this.isAttached) {
-          return;
-        }
-        console.debug("[warp10-warpscript-request-gatherer] intervalChanged - new: ", newInterval, ", old: " + oldInterval);
-        this.unregister(this.proxy, oldInterval);
-        this.register(this.proxy, newInterval);
-        generateWarpscript(this.proxy, newInterval);
+        this.unregister(oldProxy);
+        this.register(newProxy);
+        generateWarpscript(newProxy);
       },
       paramsChanged: function() {
         if (!this.isAttached) {
           return;
         }
         console.debug("[warp10-warpscript-request-gatherer] paramsChanged \n", this.name);
-        generateWarpscript(this.interval);
+        generateWarpscript(this.proxy);
       },
 
       //***********************************************************************
@@ -163,12 +138,12 @@
       //***********************************************************************
       attached: function() {
         console.debug("[warp10-warpscript-request-gatherer] attached \n", this.name);
-        this.register(this.proxy, this.interval);
+        this.register(this.proxy);
         this.isAttached = true;
-        generateWarpscript(this.proxy, this.interval);
+        generateWarpscript(this.proxy);
       },
       detached: function() {
-        this.unregister(this.proxy, this.interval);
+        this.unregister(this.proxy);
         this.isAttached = false;
         console.debug("[warp10-warpscript-request-gatherer] dettached \n", this.name);
       },
@@ -176,35 +151,27 @@
       //***********************************************************************
       // Other methods
       //***********************************************************************
-      register: function(proxy, interval) {
+      register: function(proxy) {
         if (!subscribers[proxy]) {
-          subscribers[proxy] = {};
+          subscribers[proxy] = [];
         }
-        if (!subscribers[proxy][interval]) {
-          subscribers[proxy][interval] = [];
-        }
-        if (subscribers[proxy][interval].indexOf(this) < 0) {
+        if (subscribers[proxy].indexOf(this) < 0) {
           console.debug("[warp10-warpscript-request-gatherer] register - Registering instance", this);
-          subscribers[proxy][interval].push(this);
+          subscribers[proxy].push(this);
         } else {
           console.warn("[warp10-warpscript-request-gatherer] register - Instance already registered", this);
         }
       },
-      unregister: function(proxy, interval) {
-        if (!subscribers[proxy] || !subscribers[proxy][interval]) {
+      unregister: function(proxy) {
+        if (!subscribers[proxy] ) {
           return;
         }
-        var i = subscribers[proxy][interval].indexOf(this);
+        var i = subscribers[proxy].indexOf(this);
         if (i >= 0) {
           console.debug("[warp10-warpscript-request-gatherer] unregister - Unregistering instance", this);
-          subscribers[this.interval].splice(i, 1);
+          subscribers[proxy].splice(i, 1);
         }
       },
-
     });
-
-
-
-
   })();
 </script>
