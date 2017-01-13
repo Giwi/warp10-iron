@@ -31,9 +31,11 @@
   <template>
     <warp10-warpscript-request-gatherer
         name="[[name]]"
+        proxy="test-proxy"
         warpscript="[[warpscript]]"
         interval="[[interval]]"
         on-response="_handleResponse"></warp10-warpscript-request-gatherer>
+
   </template>
   <script>
     Polymer({
@@ -50,6 +52,7 @@
 <body>
 
   <warp10-warpscript-http-proxy
+      name="test-proxy"
       presets="'Testing presets' 'preset' STORE NOW NOW"
       url="https://warp.cityzendata.net/api/v0/exec"
       interval="5"></warp10-warpscript-http-proxy>
