@@ -143,6 +143,11 @@
       // *****************************************************
       // Lifecycle
       // *****************************************************
+      attached: function() {
+        console.debug("[warp10-warpscript-caller] attached");
+        this.isAttached = true;
+        this.fire("attached");
+      },
       detached: function() {
         console.debug("[warp10-warpscript-caller] detached");
         if (this._asyncTaskId) {
