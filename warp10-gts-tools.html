@@ -184,7 +184,7 @@
       };
 
       gts.v = json.v;
-      /*            
+      /*
       for (j = 0; j < json.v.length; j++) {
         metric = json.v[j];
         gts.v.push(gtsTools.metricFromJSON(metric));
@@ -266,13 +266,13 @@
      */
     gtsTools.serializeGtsMetadata = function (gts) {
       var key, ref, serializedGtsMetadata, value;
-      serializedGtsMetadata = gts.id + " " + gts.c + "{";
+      serializedGtsMetadata = gts.id?(gts.id + " "):"" + gts.c + "{";
       ref = gts.l;
       for (key in ref) {
         value = ref[key];
         serializedGtsMetadata += key + "=" + value + ",";
       }
-      serializedGtsMetadata.slice(0, -1);
+      serializedGtsMetadata = serializedGtsMetadata.slice(0, -1);
       return serializedGtsMetadata += "}";
     };
 
