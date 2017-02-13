@@ -144,12 +144,12 @@
       // Lifecycle
       // *****************************************************
       attached: function() {
-        console.debug("[warp10-warpscript-caller] attached");
+        // console.debug("[warp10-warpscript-caller] attached");
         this.isAttached = true;
         this.fire("attached");
       },
       detached: function() {
-        console.debug("[warp10-warpscript-caller] detached");
+        // console.debug("[warp10-warpscript-caller] detached");
         if (this._asyncTaskId) {
           this.cancelAsync(this._asyncTaskId);
         }
@@ -190,7 +190,7 @@
 
       },
       _doCallWithReload: function() {
-        console.debug("[warp10-warpscript-caller] _doCallWithReload called with interval " + this._reloadInterval + " ms");
+        // console.debug("[warp10-warpscript-caller] _doCallWithReload called with interval " + this._reloadInterval + " ms");
         this._doCall();
         this._asyncTaskId = this.async(this._doCallWithReload, this._reloadInterval);
       },
@@ -283,7 +283,7 @@
 
         this.lastResponse = response;
 
-        console.debug("[warp10-warpscript-caller] receivedResponse - Updated!", response);
+        // console.debug("[warp10-warpscript-caller] receivedResponse - Updated!", response);
 
         this.fire('response', response, {
           bubbles: false
