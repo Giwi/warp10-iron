@@ -23,7 +23,7 @@
   "homepage": "https://warp10.io",
   "ignore": [],
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.7.1",
+    "polymer": "Polymer/polymer#^1.8.0",
     "iron-ajax": "PolymerElements/iron-ajax#^1.4.3",
     "iron-overlay-behavior": "PolymerElements/iron-overlay-behavior#^1.10.2",
     "iron-signals": "PolymerElements/iron-signal#^1.0.3",
