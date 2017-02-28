@@ -271,7 +271,7 @@
       for (var key in gts.l) {
         serializedLabels.push(key + "=" + gts.l[key]);
       }
-      var serializedGtsMetadata = gts.id?(gts.id + " "):"" + gts.c + "{" + serializedLabels.join(",") + "}";
+      var serializedGtsMetadata = (gts.id?(gts.id + " "):"") + gts.c + "{" + serializedLabels.join(",") + "}";
       
       return serializedGtsMetadata;
     };
