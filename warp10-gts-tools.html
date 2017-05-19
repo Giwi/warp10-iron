@@ -272,7 +272,7 @@
         serializedLabels.push(key + "=" + gts.l[key]);
       }
       var serializedGtsMetadata = (gts.id?(gts.id + " "):"") + gts.c + "{" + serializedLabels.join(",") + "}";
-      
+
       return serializedGtsMetadata;
     };
 
@@ -413,6 +413,9 @@
     gtsTools.gtsTimeRange = function (gts) {
       gtsTools.gtsSort(gts);
       // console.debug("[warp10-gts-tools] gtsTimeRange ", [gts.v[0][0], gts.v[gts.v.length - 1][0]]);
+      if (gts.v.length === 0) {
+        return null
+      }
       return [gts.v[0][0], gts.v[gts.v.length - 1][0]];
     }
 
