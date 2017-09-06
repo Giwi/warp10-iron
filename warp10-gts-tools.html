@@ -349,7 +349,7 @@
      * Returns true if @gts is a valid gts to plot
      * @alreadyInTS
      */
-    gtsTools.isGtsToPlot = function (gts) {console.log("warp10-gts-tools isGtsToPlot");
+    gtsTools.isGtsToPlot = function (gts) {
       if (!gtsTools.isGts(gts) || gts.v.length == 0) {
         // console.log("warp10-gts-tools isGtsToPlot false", {isGts: gtsTools.isGts(gts), gts_v_length: gts.v?gts.v.length:0 } );
         return false;
@@ -361,8 +361,8 @@
 
           // console.log("[warp10-gts-tools] isGtsToPlot - First value type", gts.v[i][gts.v[i].length - 1] );
           if (typeof (gts.v[i][gts.v[i].length - 1]) === 'number' || 
-              gts.v[i][gts.v[i].length - 1].constructor.name === 'Big' || 
-              gts.v[i][gts.v[i].length - 1].constructor.toFixed !== undefined ) {
+              //gts.v[i][gts.v[i].length - 1].constructor.name === 'Big' || 
+              gts.v[i][gts.v[i].length - 1].constructor.prototype.toFixed !== undefined ) {
             return true;
           }
           break;
@@ -385,13 +385,10 @@
 
       for (var i = 0; i < gts.v.length; i++) {
         if (gts.v[i][gts.v[i].length - 1] !== null) {
-          // console.log("[warp10-gts-tools] isGtsToAnnotate - First value", (typeof (gts.v[i][gts.v[i].length - 1]) !== 'number' || 
-          //    !gts.v[i][gts.v[i].length - 1].constructor ||
-          //    gts.v[i][gts.v[i].length - 1].constructor.name !== 'Big')  );
           if (typeof (gts.v[i][gts.v[i].length - 1]) !== 'number' && 
               ( !gts.v[i][gts.v[i].length - 1].constructor &&
                 gts.v[i][gts.v[i].length - 1].constructor.name !== 'Big') &&
-                gts.v[i][gts.v[i].length - 1].constructor.toFixed !== undefined) {
+                gts.v[i][gts.v[i].length - 1].constructor.prototype.toFixed !== undefined) {
             return true;
           }
           break;
