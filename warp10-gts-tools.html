@@ -384,7 +384,12 @@
 
       for (var i = 0; i < gts.v.length; i++) {
         if (gts.v[i][gts.v[i].length - 1] !== null) {
-          if (typeof (gts.v[i][gts.v[i].length - 1]) !== 'number') {
+          console.log("[warp10-gts-tools] isGtsToAnnotate - First value", (typeof (gts.v[i][gts.v[i].length - 1]) !== 'number' || 
+              !gts.v[i][gts.v[i].length - 1].constructor ||
+              gts.v[i][gts.v[i].length - 1].constructor.name !== 'Big')  );
+          if (typeof (gts.v[i][gts.v[i].length - 1]) !== 'number' || 
+              ( !gts.v[i][gts.v[i].length - 1].constructor &&
+                gts.v[i][gts.v[i].length - 1].constructor.name !== 'Big')) {
             return true;
           }
           break;
