@@ -21,7 +21,7 @@
 
       try {
         response = looseJSON.parse(data);
-        //console.debug(response)
+        //console.log(response)
       } catch (e) {
          console.error("Response non JSON compliant", data);
         return false;
@@ -200,7 +200,7 @@
      * Generates a GTS stack from the received JSON
      */
     gtsTools.gtsFromJSONList = function (jsonList, prefixId) {
-      // console.debug("[czd-gts-tools] gtsFromJSONList, jsonList", { list: jsonList });
+      // console.log("[czd-gts-tools] gtsFromJSONList, jsonList", { list: jsonList });
       var gts, gtsList, i, id;
       gtsList = [];
       for (i = 0; i < jsonList.length; i++) {
@@ -231,7 +231,7 @@
             id: id
           });
         }
-        // console.debug("[czd-gts-tools] gtsFromJSONList, gtsList ", gtsList);
+        // console.log("[czd-gts-tools] gtsFromJSONList, gtsList ", gtsList);
 
       }
       return {
@@ -349,9 +349,9 @@
      * Returns true if @gts is a valid gts to plot
      * @alreadyInTS
      */
-    gtsTools.isGtsToPlot = function (gts) {
+    gtsTools.isGtsToPlot = function (gts) {console.log("warp10-gts-tools isGtsToPlot");
       if (!gtsTools.isGts(gts) || gts.v.length == 0) {
-        // console.debug("warp10-gts-tools isGtsToPlot false", {isGts: gtsTools.isGts(gts), gts_v_length: gts.v?gts.v.length:0 } );
+        // console.log("warp10-gts-tools isGtsToPlot false", {isGts: gtsTools.isGts(gts), gts_v_length: gts.v?gts.v.length:0 } );
         return false;
       }
       // We look at the first non-null value, if it's a String or Boolean it's an annotation GTS,
@@ -359,8 +359,9 @@
       for (var i = 0; i < gts.v.length; i++) {
         if (gts.v[i][gts.v[i].length - 1] !== null) {
 
-          // console.debug("[warp10-gts-tools] isGtsToPlot - First value", gts.v[i][gts.v[i].length - 1]);
-          if (typeof (gts.v[i][gts.v[i].length - 1]) === 'number') {
+          console.log("[warp10-gts-tools] isGtsToPlot - First value type", gts.v[i][gts.v[i].length - 1] );
+          if (typeof (gts.v[i][gts.v[i].length - 1]) === 'number' || 
+              gts.v[i][gts.v[i].length - 1].constructor.name === 'Big') {
             return true;
           }
           break;
@@ -400,7 +401,7 @@
       if (gts.isSorted) {
         return;
       }
-      // console.debug("[warp10-gts-tools] gtsSort ", gts);
+      // console.log("[warp10-gts-tools] gtsSort ", gts);
       gts.v = gts.v.sort(function (a, b) { return a[0] - b[0]; });
       gts.isSorted = true;
     }
@@ -412,7 +413,7 @@
      */
     gtsTools.gtsTimeRange = function (gts) {
       gtsTools.gtsSort(gts);
-      // console.debug("[warp10-gts-tools] gtsTimeRange ", [gts.v[0][0], gts.v[gts.v.length - 1][0]]);
+      // console.log("[warp10-gts-tools] gtsTimeRange ", [gts.v[0][0], gts.v[gts.v.length - 1][0]]);
       if (gts.v.length === 0) {
         return null
       }
