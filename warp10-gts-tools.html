@@ -23,18 +23,17 @@
         response = looseJSON.parse(data);
         //console.log(response)
       } catch (e) {
-         console.error("Response non JSON compliant", data);
+        console.error("Response non JSON compliant", data);
         return false;
       }
 
       if (!gtsTools.isArray(response)) {
-         console.error("Response isn't an Array", response);
+        console.error("Response isn't an Array", response);
         return false;
       }
 
       return true;
     };
-
 
 
     /**
@@ -68,7 +67,7 @@
      * `key` must be chosen from https://www.mapbox.com/maki/
      */
     gtsTools.isPositionArray = function (item) {
-      if ((item === null) || (item.positions === null)) {
+      if (!item || !item.positions) {
         return false;
       }
       if (gtsTools.isPositionsArrayWithValues(item) || gtsTools.isPositionsArrayWithTwoValues(item)) {
@@ -267,14 +266,10 @@
       for (var key in gts.l) {
         serializedLabels.push(key + "=" + gts.l[key]);
       }
-      var serializedGtsMetadata = (gts.id?(gts.id + " "):"") + gts.c + "{" + serializedLabels.join(",") + "}";
+      var serializedGtsMetadata = (gts.id ? (gts.id + " ") : "") + gts.c + "{" + serializedLabels.join(",") + "}";
 
       return serializedGtsMetadata;
     };
-
-
-
-
 
 
     /**
@@ -285,7 +280,9 @@
       var path = [];
 
       // Sort values
-      gts.v = gts.v.sort(function (a, b) { return a[0] - b[0]; });
+      gts.v = gts.v.sort(function (a, b) {
+        return a[0] - b[0];
+      });
 
       for (var i = 0; i < gts.v.length; i++) {
         var metric = gts.v[i];
@@ -298,23 +295,29 @@
         }
         if (metric.length === 4) {
           // timestamp, lat, lon, value
-          path.push({ ts: Math.floor(metric[0] / 1000), lat: metric[1], lon: metric[2], val: metric[3] });
+          path.push({ts: Math.floor(metric[0] / 1000), lat: metric[1], lon: metric[2], val: metric[3]});
         }
         if (metric.length === 5) {
           // timestamp, lat, lon, elevation, value
-          path.push({ ts: Math.floor(metric[0] / 1000), lat: metric[1], lon: metric[2], elev: metric[3], val: metric[4] });
+          path.push({
+            ts: Math.floor(metric[0] / 1000),
+            lat: metric[1],
+            lon: metric[2],
+            elev: metric[3],
+            val: metric[4]
+          });
         }
       }
       return path;
     };
 
     /**
-    * Returns true if the two GTS have the same metadata
-    * @alreadyInTS
-    */
+     * Returns true if the two GTS have the same metadata
+     * @alreadyInTS
+     */
     gtsTools.equalMetadata = function (a, b) {
       if (a.c === undefined || b.c === undefined || a.l === undefined || b.l === undefined || !(a.l instanceof Object) || !(b.l instanceof Object)) {
-         console.error("[warp10-gts-tools] equalMetadata - Error in GTS, metadata is not well formed");
+        console.error("[warp10-gts-tools] equalMetadata - Error in GTS, metadata is not well formed");
         return false;
       }
       if (a.c !== b.c) {
@@ -337,7 +340,7 @@
     gtsTools.isGts = function (item) {
       return !(item === null || item.c === null || item.l === null || item.a === null || item.v === null || !gtsTools.isArray(item.v));
     }
-;
+    ;
     /**
      * Returns true if @gts is a valid gts to plot
      * @alreadyInTS
@@ -353,9 +356,9 @@
         if (gts.v[i][gts.v[i].length - 1] !== null) {
 
           // console.log("[warp10-gts-tools] isGtsToPlot - First value type", gts.v[i][gts.v[i].length - 1] );
-          if (typeof (gts.v[i][gts.v[i].length - 1]) === 'number' || 
-              //gts.v[i][gts.v[i].length - 1].constructor.name === 'Big' || 
-              gts.v[i][gts.v[i].length - 1].constructor.prototype.toFixed !== undefined ) {
+          if (typeof (gts.v[i][gts.v[i].length - 1]) === 'number' ||
+            //gts.v[i][gts.v[i].length - 1].constructor.name === 'Big' ||
+            gts.v[i][gts.v[i].length - 1].constructor.prototype.toFixed !== undefined) {
             return true;
           }
           break;
@@ -372,16 +375,15 @@
       if (!gtsTools.isGts(gts) || gts.v.length === 0) {
         return false;
       }
-
       // We look at the first non-null value, if it's a String or Boolean it's an annotation GTS,
       // if it's a number it's a GTS to plot
 
       for (var i = 0; i < gts.v.length; i++) {
         if (gts.v[i][gts.v[i].length - 1] !== null) {
-          if (typeof (gts.v[i][gts.v[i].length - 1]) !== 'number' && 
-              ( !gts.v[i][gts.v[i].length - 1].constructor &&
-                gts.v[i][gts.v[i].length - 1].constructor.name !== 'Big') &&
-                gts.v[i][gts.v[i].length - 1].constructor.prototype.toFixed !== undefined) {
+          if (typeof (gts.v[i][gts.v[i].length - 1]) !== 'number' &&
+            ( !!gts.v[i][gts.v[i].length - 1].constructor &&
+              gts.v[i][gts.v[i].length - 1].constructor.name !== 'Big') &&
+            gts.v[i][gts.v[i].length - 1].constructor.prototype.toFixed === undefined) {
             return true;
           }
           break;
@@ -399,7 +401,9 @@
         return;
       }
       // console.log("[warp10-gts-tools] gtsSort ", gts);
-      gts.v = gts.v.sort(function (a, b) { return a[0] - b[0]; });
+      gts.v = gts.v.sort(function (a, b) {
+        return a[0] - b[0];
+      });
       gts.isSorted = true;
     };
 
