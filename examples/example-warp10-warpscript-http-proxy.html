@@ -29,19 +29,36 @@
 
 <dom-module is="example-container">
   <template>
+    <style>
+      .container {
+        border: solid 1px #444;
+        padding: 16px;
+        margin: 16px;
+        border-radius: 5px;
+      }
+    </style>
     <warp10-warpscript-request-gatherer
         name="[[name]]"
         proxy="test-proxy"
         warpscript="[[warpscript]]"
         interval="[[interval]]"
         on-response="_handleResponse"></warp10-warpscript-request-gatherer>
-
+    <div class="container">
+      [[result]]
+    </div>
   </template>
   <script>
     Polymer({
       is: "example-container",
+      properties: {
+        result: { 
+          type: String,
+          value: '',
+        }
+      },
       _handleResponse: function(evt, response) {
         console.debug("[example-container] _handleResponse - name", this.name, "response", response);
+        this.result = response[0];
       }
     });
   </script>

@@ -123,7 +123,7 @@
           if (!this.evtListener) {
             this.evtListener = function(evt) {
               console.debug("[warp10-warpscript-http-proxy] - evtListener", context);
-              if (evt.detail.interval == context.interval) {
+              if (evt.detail.warpscript) {
                 context.warpscript = evt.detail.warpscript;
               }
             }
