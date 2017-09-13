@@ -245,10 +245,10 @@
       }
       for (j = 0; j < a.content.length; j++) {
         elem = a.content[j];
-        if (elem.content !== null) {
+        if (!!elem.content) {
           this.flattenGtsIdArray(elem, r);
         } else {
-          if (elem.gts !== undefined) {
+          if (!!elem.gts) {
             r.push(elem.gts);
           }
         }
