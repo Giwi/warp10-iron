@@ -24,93 +24,93 @@
         auto></warp10-warpscript-caller>
   </template>
   <script>
-    var evtListener =
-      Polymer({
-        is: "warp10-warpscript-http-proxy",
-        properties: {
-          /**
-           * The name of this instance of `warp10-warpscript-http-proxy`
-           */
-          name: {
-            type: String,
-            value: "warpscript-http-proxy",
-            observer: "_nameChanged"
+    let evtListener =
+        Polymer({
+          is: "warp10-warpscript-http-proxy",
+          properties: {
+            /**
+             * The name of this instance of `warp10-warpscript-http-proxy`
+             */
+            name: {
+              type: String,
+              value: "warpscript-http-proxy",
+              observer: "_nameChanged"
+            },
+
+            /**
+             * URL of WarpScript platform
+             */
+            url: {
+              type: String,
+              value: ""
+            },
+
+            /**
+             * WarpScript script to execute
+             */
+            warpscript: {
+              type: String,
+              value: ""
+            },
+
+            /**
+             * If `interval`  > 0` it's the number of seconds between two calls
+             * to the WarpScript server.
+             */
+            interval: {
+              type: Number,
+              value: 0
+            },
+
+            /**
+             * Presets to pre-append to the scripts
+             */
+            presets: {
+              type: String,
+              value: ""
+            },
+
+            _warpscript: {
+              type: String,
+              computed: "_appendPresets(warpscript,presets)"
+            }
           },
 
-          /**
-           * URL of WarpScript platform
-           */
-          url: {
-            type: String,
-            value: ""
-          },
-
-          /**
-           * WarpScript script to execute
-           */
-          warpscript: {
-            type: String,
-            value: ""
-          },
-
-          /**
-           * If `interval`  > 0` it's the number of seconds between two calls
-           * to the WarpScript server.
-           */
-          interval: {
-            type: Number,
-            value: 0,
-          },
-
-          /**
-           * Presets to pre-append to the scripts
-           */
-          presets: {
-            type: String,
-            value: "",
-          },
-
-          _warpscript: {
-            type: String,
-            computed: "_appendPresets(warpscript,presets)"
-          },
-        },
-
-        //***********************************************************************
-        // Observers
-        //***********************************************************************
-        _nameChanged: function(oldName, newName) {
+          //***********************************************************************
+          // Observers
+          //***********************************************************************
+          _nameChanged: function (oldName, newName) {
             this.unregister(oldName);
             this.register(name);
-        },
+          },
 
-        //***********************************************************************
-        // Lifecycle methods
-        //***********************************************************************
-        attached: function() {
-          this.register(this.name);
-          this.isAttached = true;
-        },
+          //***********************************************************************
+          // Lifecycle methods
+          //***********************************************************************
+          attached: function () {
+            this.register(this.name);
+            this.isAttached = true;
+          },
 
-        detached: function() {
-          this.unregister(this.name);
-          this.isAttached = false;
-        },
+          detached: function () {
+            this.unregister(this.name);
+            this.isAttached = false;
+          },
 
-        //***********************************************************************
-        // Event listeners
-        //***********************************************************************
-        _handleResponse: function(evt, response) {
-          var event = new CustomEvent("warpscript-request-gatherer-response", {
-            detail: {
-              proxy: this.name,
-              interval: this.interval,
-              response: response
-            }
-          });
-          // console.debug("[warp10-warpscript-http-proxy] - _handleResponse", event);
-          document.dispatchEvent(event);
-        },
+          //***********************************************************************
+          // Event listeners
+          //***********************************************************************
+          _handleResponse: function (evt, response) {
+            let event = new CustomEvent("warpscript-request-gatherer-response", {
+              detail: {
+                proxy: this.name,
+                interval: this.interval,
+                response: response
+              }
+            });
+           console.debug("[warp10-warpscript-http-proxy] - _handleResponse", event);
+            document.dispatchEvent(event);
+          },
 
         //***********************************************************************
         // Other methods
@@ -134,6 +134,6 @@
             document.removeEventListener("request-gathered-for-"+name, this.evtListener);
         },
 
-      });
+        });
   </script>
 </dom-module>

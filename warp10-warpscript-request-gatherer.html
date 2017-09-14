@@ -6,7 +6,7 @@
 <link rel="import" href=" ../polymer/polymer.html">
 
 <script>
-  (function() {
+  (function () {
 
 
     /*
@@ -27,33 +27,33 @@
      */
     function generateWarpscript(proxy) {
       var warpscript = "{} '__result' STORE \n" +
-        "<% '__name' STORE DEPTH ->LIST '__stack' STORE $__result $__stack $__name PUT '__name' STORE %> '__stack2map' STORE \n";
+          "<% '__name' STORE DEPTH ->LIST '__stack' STORE $__result $__stack $__name PUT '__name' STORE %> '__stack2map' STORE \n";
       var beginMacro = "<%\n  SAVE '__context' STORE \n";
       var endMacro = "\n  $__context RESTORE\n%> ";
       for (var i in subscribers[proxy]) {
         var s = subscribers[proxy][i];
         var name = s.name + "_" + i;
         warpscript +=
-          beginMacro + s.warpscript + endMacro +
-          "'" + name + "' STORE\n" +
-          "@" + name + " '" + name + "' @__stack2map\n";
+            beginMacro + s.warpscript + endMacro +
+            "'" + name + "' STORE\n" +
+            "@" + name + " '" + name + "' @__stack2map\n";
       }
       warpscript += "$__result";
       // console.debug("[warp10-warpscript-request-gatherer] generateWarpscript \n", warpscript);
       if (!proxifiedWarpscript[proxy]) {
-          proxifiedWarpscript[proxy] = {};
+        proxifiedWarpscript[proxy] = {};
       }
       proxifiedWarpscript[proxy] = warpscript;
-      console.debug("[warp10-warpscript-request-gatherer] generateWarpscript \n", proxifiedWarpscript);
+      console.debug("[warp10-warpscript-request-gatherer] generateWarpscript", proxy, proxifiedWarpscript);
 
-      var event = new CustomEvent("request-gathered-for-"+proxy, {
+      var event = new CustomEvent("request-gathered-for-" + proxy, {
         detail: {
           proxy: proxy,
           warpscript: warpscript
         }
       });
       document.dispatchEvent(event);
-    };
+    }
 
     /**
      * Event listener function called when a response is receiver. It sends an response event to every
@@ -77,7 +77,7 @@
         // console.debug("[warp10-warpscript-request-gatherer] requestGathererResponse", event.detail);
         s.dispatchEvent(event);
       }
-    };
+    }
 
     // Event listener
     document.addEventListener("warpscript-request-gatherer-response", requestGathererResponse);
@@ -116,7 +116,7 @@
       //***********************************************************************
       // Observers
       //***********************************************************************
-      proxyChanged: function(newProxy, oldProxy) {
+      proxyChanged: function (newProxy, oldProxy) {
         if (!this.isAttached) {
           return;
         }
@@ -125,7 +125,7 @@
         this.register(newProxy);
         generateWarpscript(newProxy);
       },
-      paramsChanged: function() {
+      paramsChanged: function () {
         if (!this.isAttached) {
           return;
         }
@@ -136,13 +136,13 @@
       //***********************************************************************
       // Lifecycle methods
       //***********************************************************************
-      attached: function() {
+      attached: function () {
         console.debug("[warp10-warpscript-request-gatherer] attached \n", this.name);
         this.register(this.proxy);
         this.isAttached = true;
         generateWarpscript(this.proxy);
       },
-      detached: function() {
+      detached: function () {
         this.unregister(this.proxy);
         this.isAttached = false;
         console.debug("[warp10-warpscript-request-gatherer] dettached \n", this.name);
@@ -151,7 +151,7 @@
       //***********************************************************************
       // Other methods
       //***********************************************************************
-      register: function(proxy) {
+      register: function (proxy) {
         if (!subscribers[proxy]) {
           subscribers[proxy] = [];
         }
@@ -162,8 +162,8 @@
           console.warn("[warp10-warpscript-request-gatherer] register - Instance already registered", this);
         }
       },
-      unregister: function(proxy) {
-        if (!subscribers[proxy] ) {
+      unregister: function (proxy) {
+        if (!subscribers[proxy]) {
           return;
         }
         var i = subscribers[proxy].indexOf(this);
