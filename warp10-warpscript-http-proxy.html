@@ -79,7 +79,7 @@
           //***********************************************************************
           // Observers
           //***********************************************************************
-          _nameChanged: function (oldName, newName) {
+          _nameChanged: function(oldName, newName) {
             this.unregister(oldName);
             this.register(name);
           },
@@ -87,12 +87,12 @@
           //***********************************************************************
           // Lifecycle methods
           //***********************************************************************
-          attached: function () {
+          attached: function() {
             this.register(this.name);
             this.isAttached = true;
           },
 
-          detached: function () {
+          detached: function() {
             this.unregister(this.name);
             this.isAttached = false;
           },
@@ -100,7 +100,7 @@
           //***********************************************************************
           // Event listeners
           //***********************************************************************
-          _handleResponse: function (evt, response) {
+          _handleResponse: function(evt, response) {
             let event = new CustomEvent("warpscript-request-gatherer-response", {
               detail: {
                 proxy: this.name,
@@ -108,31 +108,31 @@
                 response: response
               }
             });
-           console.debug("[warp10-warpscript-http-proxy] - _handleResponse", event);
+            console.debug("[warp10-warpscript-http-proxy] - _handleResponse", event);
             document.dispatchEvent(event);
           },
 
-        //***********************************************************************
-        // Other methods
-        //***********************************************************************
-        _appendPresets: function() {
-          return this.presets+"\n CLEAR \n"+this.warpscript;
-        },
-        register(name) {
-          var context = this;
-          if (!this.evtListener) {
-            this.evtListener = function(evt) {
-              console.debug("[warp10-warpscript-http-proxy] - evtListener", context);
-              if (evt.detail.warpscript) {
-                context.warpscript = evt.detail.warpscript;
+          //***********************************************************************
+          // Other methods
+          //***********************************************************************
+          _appendPresets: function() {
+            return this.presets + "\n CLEAR \n" + this.warpscript;
+          },
+          register(name) {
+            var context = this;
+            if (!this.evtListener) {
+              this.evtListener = function(evt) {
+                console.debug("[warp10-warpscript-http-proxy] - evtListener", context);
+                if (evt.detail.warpscript) {
+                  context.warpscript = evt.detail.warpscript;
+                }
               }
             }
-          }
-          document.addEventListener("request-gathered-for-"+name, this.evtListener);
-        },
-        unregister(name) {
-            document.removeEventListener("request-gathered-for-"+name, this.evtListener);
-        },
+            document.addEventListener("request-gathered-for-" + name, this.evtListener);
+          },
+          unregister(name) {
+            document.removeEventListener("request-gathered-for-" + name, this.evtListener);
+          },
 
         });
   </script>
