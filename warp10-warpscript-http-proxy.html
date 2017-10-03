@@ -118,8 +118,9 @@
           _appendPresets: function() {
             if(!this.warpscript || this.warpscript === '') {
               return undefined;
+            } else {
+              return this.presets + "\n CLEAR \n" + this.warpscript;
             }
-            return this.presets + "\n CLEAR \n" + this.warpscript;
           },
           register(name) {
             var context = this;
