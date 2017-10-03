@@ -1,4 +1,4 @@
-<!--
+./<!--
 @author Horacio Gonzalez (@lostinbrittany)
 @copyright (c) 2016 Cityzen Data
 @license Apache 2.0
@@ -116,7 +116,11 @@
           // Other methods
           //***********************************************************************
           _appendPresets: function() {
-            return this.presets + "\n CLEAR \n" + this.warpscript;
+            if(!this.warpscript || this.warpscript === '') {
+              return undefined;
+            } else {
+              return this.presets + "\n CLEAR \n" + this.warpscript;
+            }
           },
           register(name) {
             var context = this;
