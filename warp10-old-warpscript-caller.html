@@ -196,7 +196,9 @@
     },
     doCallWithReload: function() {
       // console.debug("[warp10-warpscript-caller] doReload called with interval "+this.reloadInterval+" ms");
-      this.doCall();
+      if(!this.loading) {
+        this.doCall();
+      }
       this.async(this.doCallWithReload, this.reloadInterval);
     },
 
