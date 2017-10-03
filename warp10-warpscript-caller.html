@@ -24,8 +24,9 @@
   </template>
 
   <script>
+    /* global looseJSON */
     Polymer({
-      is: "warp10-warpscript-caller",
+      is: 'warp10-warpscript-caller',
 
       /**
        * Fired when a request is sent.
@@ -51,7 +52,7 @@
          */
         url: {
           type: String,
-          value: ""
+          value: '',
         },
 
         /**
@@ -59,7 +60,7 @@
          */
         warpscript: {
           type: String,
-          value: ""
+          value: '',
         },
 
         /**
@@ -68,7 +69,7 @@
          */
         reload: {
           type: Number,
-          value: -1
+          value: -1,
         },
 
         /**
@@ -77,7 +78,7 @@
          */
         auto: {
           type: Boolean,
-          value: false
+          value: false,
         },
 
         /**
@@ -86,7 +87,7 @@
         loading: {
           type: Boolean,
           value: false,
-          notify: true
+          notify: true,
         },
 
         /**
@@ -95,7 +96,7 @@
         lastRequest: {
           type: Object,
           notify: true,
-          readOnly: true
+          readOnly: true,
         },
 
         /**
@@ -110,7 +111,7 @@
         lastResponse: {
           type: Object,
           notify: true,
-          readOnly: true
+          readOnly: true,
         },
 
         /**
@@ -121,7 +122,7 @@
         lastError: {
           type: Object,
           notify: true,
-          readOnly: true
+          readOnly: true,
         },
 
         /**
@@ -130,42 +131,53 @@
         debounceDuration: {
           type: Number,
           value: 0,
-          notify: true
+          notify: true,
         },
 
+        /**
+         * If true debug logs are sent to the console
+         */
+        debug: {
+            type: Boolean,
+            value: false,
+        },
       },
 
 
       observers: [
-        '_optionsChanged(url, warpscript, reload, auto)'
+        '_optionsChanged(url, warpscript, reload, auto)',
       ],
 
       // *****************************************************
       // Lifecycle
       // *****************************************************
       attached: function() {
-        console.debug("[warp10-warpscript-caller] attached");
+        if (this.debug) {
+          console.log('[warp10-warpscript-caller] attached');
+        }
         this.isAttached = true;
-        this.fire("attached");
+        this.fire('attached');
       },
       detached: function() {
-        console.debug("[warp10-warpscript-caller] detached");
+        if (this.debug) {
+          console.log('[warp10-warpscript-caller] detached');
+        }
         if (this._asyncTaskId) {
           this.cancelAsync(this._asyncTaskId);
         }
-
       },
 
       /**
        * Performs an AJAX request to the specified URL with the WarpScript payload
        */
       generateRequest: function() {
-        console.debug("[warp10-warpscript-caller] generateRequest - WarpScript script", this.warpscript);
+        if (this.debug) {
+          console.log('[warp10-warpscript-caller] generateRequest - WarpScript script', this.warpscript);
+        }
         this.cancelAsync(this._asyncTaskId);
         if (this.reload > 0) {
           // If `reload > 0` set reloading interval and call, else call directly
           this._reloadInterval = parseFloat(this.reload) * 1000;
-          // console.debug("[warp10-warpscript-caller] generateRequest - Reload interval in ms", this._reloadInterval);
           this._doCallWithReload();
         } else {
           this._doCall();
@@ -174,24 +186,28 @@
 
 
       _optionsChanged: function() {
+        let context = this;
         this.debounce('generate-request', function() {
-          if ((this.url === null) || (this.warpscript === undefined) || (this.warpscript.length <= 0)) {
+          if ((context.url === null) || (context.warpscript === undefined) || (context.warpscript.length <= 0)) {
             return;
           }
-          if (this.auto) {
-            this.generateRequest();
+          if (context.auto) {
+            context.generateRequest();
           }
         }, this.debounceDuration);
       },
 
       _doCall: function() {
-        console.debug("[warp10-warpscript-caller] doCall - Calling with WarpScript script", this.warpscript);
+        if (this.debug) {
+          console.log('[warp10-warpscript-caller] doCall - Calling with WarpScript script', this.warpscript);
+        }
         this.lastRequest = this.$.xhr.generateRequest();
-
       },
       _doCallWithReload: function() {
-        console.debug("[warp10-warpscript-caller] _doCallWithReload called with interval " + this._reloadInterval + " ms");
-        if(!this.loading) {
+        if (this.debug) {
+          console.log('[warp10-warpscript-caller] _doCallWithReload called with interval ' + this._reloadInterval + ' ms');
+        }
+        if (!this.loading) {
           this._doCall();
         }
         this._asyncTaskId = this.async(this._doCallWithReload, this._reloadInterval);
@@ -201,9 +217,10 @@
         var allowerHeaders = ironRequest.xhr.getAllResponseHeaders().split('\n').map(function(i) {
           return i.split(':')[0].trim();
         });
-        console.debug("[warp10-warpscript-caller] _getElapsed - allowerHeaders", allowerHeaders);
-
-        var elapsedHeader = "X-Warp10-Elapsed";
+        if (this.debug) {
+          console.log('[warp10-warpscript-caller] _getElapsed - allowerHeaders', allowerHeaders);
+        }
+        var elapsedHeader = 'X-Warp10-Elapsed';
         for (var i in allowerHeaders) {
           if (allowerHeaders[i].match('-Elapsed')) {
             elapsedHeader = allowerHeaders[i];
@@ -215,9 +232,10 @@
         var allowerHeaders = ironRequest.xhr.getAllResponseHeaders().split('\n').map(function(i) {
           return i.split(':')[0].trim();
         });
-        console.debug("[warp10-warpscript-caller] _getFetched - allowerHeaders", allowerHeaders);
-
-        var fetchedHeader = "X-Warp10-Fetched";
+        if (this.debug) {
+          console.log('[warp10-warpscript-caller] _getFetched - allowerHeaders', allowerHeaders);
+        }
+        var fetchedHeader = 'X-Warp10-Fetched';
         for (var i in allowerHeaders) {
           if (allowerHeaders[i].match('-Fetched')) {
             fetchedHeader = allowerHeaders[i];
@@ -229,9 +247,10 @@
         var allowerHeaders = ironRequest.xhr.getAllResponseHeaders().split('\n').map(function(i) {
           return i.split(':')[0].trim();
         });
-        console.debug("[warp10-warpscript-caller] _getOperations - allowerHeaders", allowerHeaders);
-
-        var operationsHeader = "X-Warp10-Ops";
+        if (this.debug) {
+          console.log('[warp10-warpscript-caller] _getOperations - allowerHeaders', allowerHeaders);
+        }
+        var operationsHeader = 'X-Warp10-Ops';
         for (var i in allowerHeaders) {
           if (allowerHeaders[i].match('-Ops')) {
             operationsHeader = allowerHeaders[i];
@@ -243,9 +262,11 @@
         var allowerHeaders = ironRequest.xhr.getAllResponseHeaders().split('\n').map(function(i) {
           return i.split(':')[0].trim();
         });
-        console.debug("[warp10-warpscript-caller] _getErrorLine - ironRequest.xhr.getAllResponseHeaders()", ironRequest.xhr.getAllResponseHeaders());
-
-        var errorLineHeader = "X-Warp10-Error-Line";
+        if (this.debug) {
+          console.log('[warp10-warpscript-caller] _getErrorLine - ironRequest.xhr.getAllResponseHeaders()',
+              ironRequest.xhr.getAllResponseHeaders());
+        }
+        var errorLineHeader = 'X-Warp10-Error-Line';
         for (var i in allowerHeaders) {
           if (allowerHeaders[i].match('-Error-Line')) {
             errorLineHeader = allowerHeaders[i];
@@ -257,9 +278,10 @@
         var allowerHeaders = ironRequest.xhr.getAllResponseHeaders().split('\n').map(function(i) {
           return i.split(':')[0].trim();
         });
-        console.debug("[warp10-warpscript-caller] _getOperations - allowerHeaders", allowerHeaders);
-
-        var errorMsgHeader = "X-Warp10-Error-Message";
+        if (this.debug) {
+          console.log('[warp10-warpscript-caller] _getOperations - allowerHeaders', allowerHeaders);
+        }
+        var errorMsgHeader = 'X-Warp10-Error-Message';
         for (var i in allowerHeaders) {
           if (allowerHeaders[i].match('-Error-Message')) {
             errorMsgHeader = allowerHeaders[i];
@@ -279,16 +301,17 @@
           options: {
             elapsed: elapsed,
             fetched: fetched,
-            operations: operations
-          }
+            operations: operations,
+          },
         };
 
         this.lastResponse = response;
 
-        console.debug("[warp10-warpscript-caller] receivedResponse - Updated!", response);
-
+        if (this.debug) {
+          console.log('[warp10-warpscript-caller] receivedResponse - Updated!', response);
+        }
         this.fire('response', response, {
-          bubbles: false
+          bubbles: false,
         });
       },
       _handleError: function(event, error) {
@@ -299,11 +322,11 @@
         error.errorLine = this._getErrorLine(error.request);
         error.errorMsg = this._getErrorMsg(error.request);
         this.fire('error', error, {
-          bubbles: false
+          bubbles: false,
         });
       },
 
-    })
+    });
   </script>
 
 </dom-module>
