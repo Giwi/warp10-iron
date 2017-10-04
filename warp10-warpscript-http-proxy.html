@@ -25,125 +25,135 @@
         auto></warp10-warpscript-caller>
   </template>
   <script>
-    let evtListener =
-        Polymer({
-          is: "warp10-warpscript-http-proxy",
-          properties: {
-            /**
-             * The name of this instance of `warp10-warpscript-http-proxy`
-             */
-            name: {
-              type: String,
-              value: "warpscript-http-proxy",
-              observer: "_nameChanged"
-            },
+    Polymer({
+      is: 'warp10-warpscript-http-proxy',
+      properties: {
+        /**
+          * The name of this instance of `warp10-warpscript-http-proxy`
+          */
+        name: {
+          type: String,
+          value: 'warpscript-http-proxy',
+          observer: '_nameChanged',
+        },
 
-            /**
-             * URL of WarpScript platform
-             */
-            url: {
-              type: String,
-              value: ""
-            },
+        /**
+          * URL of WarpScript platform
+          */
+        url: {
+          type: String,
+          value: '',
+        },
 
-            /**
-             * WarpScript script to execute
-             */
-            warpscript: {
-              type: String,
-              value: ""
-            },
+        /**
+          * WarpScript script to execute
+          */
+        warpscript: {
+          type: String,
+          value: '',
+        },
 
-            /**
-             * If `interval`  > 0` it's the number of seconds between two calls
-             * to the WarpScript server.
-             */
-            interval: {
-              type: Number,
-              value: 0
-            },
+        /**
+          * If `interval`  > 0` it's the number of seconds between two calls
+          * to the WarpScript server.
+          */
+        interval: {
+          type: Number,
+          value: 0,
+        },
 
-            /**
-             * Presets to pre-append to the scripts
-             */
-            presets: {
-              type: String,
-              value: ""
-            },
+        /**
+          * Presets to pre-append to the scripts
+          */
+        presets: {
+          type: String,
+          value: '',
+        },
 
-            _warpscript: {
-              type: String,
-              computed: "_appendPresets(warpscript,presets)"
-            },
-            loading: {
-              type: Boolean,
-              value: false,
-              notify: true,
-            }
+        /**
+         * If true debug logs are sent to the console
+         */
+         debug: {
+            type: Boolean,
+            value: false,
+        },
+
+        loading: {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+
+        _warpscript: {
+          type: String,
+          computed: '_appendPresets(warpscript,presets)',
+        },
+      },
+
+      //* **********************************************************************
+      // Observers
+      //* **********************************************************************
+      _nameChanged: function(oldName, newName) {
+        this.unregister(oldName);
+        this.register(name);
+      },
+
+      //* **********************************************************************
+      // Lifecycle methods
+      //* **********************************************************************
+      attached: function() {
+        this.register(this.name);
+        this.isAttached = true;
+      },
+
+      detached: function() {
+        this.unregister(this.name);
+        this.isAttached = false;
+      },
+
+      //* **********************************************************************
+      // Event listeners
+      //* **********************************************************************
+      _handleResponse: function(evt, response) {
+        let event = new CustomEvent('warpscript-request-gatherer-response', {
+          detail: {
+            proxy: this.name,
+            interval: this.interval,
+            response: response,
           },
-
-          //***********************************************************************
-          // Observers
-          //***********************************************************************
-          _nameChanged: function(oldName, newName) {
-            this.unregister(oldName);
-            this.register(name);
-          },
-
-          //***********************************************************************
-          // Lifecycle methods
-          //***********************************************************************
-          attached: function() {
-            this.register(this.name);
-            this.isAttached = true;
-          },
-
-          detached: function() {
-            this.unregister(this.name);
-            this.isAttached = false;
-          },
-
-          //***********************************************************************
-          // Event listeners
-          //***********************************************************************
-          _handleResponse: function(evt, response) {
-            let event = new CustomEvent("warpscript-request-gatherer-response", {
-              detail: {
-                proxy: this.name,
-                interval: this.interval,
-                response: response
-              }
-            });
-            console.debug("[warp10-warpscript-http-proxy] - _handleResponse", event);
-            document.dispatchEvent(event);
-          },
-
-          //***********************************************************************
-          // Other methods
-          //***********************************************************************
-          _appendPresets: function() {
-            if(!this.warpscript || this.warpscript === '') {
-              return undefined;
-            } else {
-              return this.presets + "\n CLEAR \n" + this.warpscript;
-            }
-          },
-          register(name) {
-            var context = this;
-            if (!this.evtListener) {
-              this.evtListener = function(evt) {
-                console.debug("[warp10-warpscript-http-proxy] - evtListener", context);
-                if (evt.detail.warpscript) {
-                  context.warpscript = evt.detail.warpscript;
-                }
-              }
-            }
-            document.addEventListener("request-gathered-for-" + name, this.evtListener);
-          },
-          unregister(name) {
-            document.removeEventListener("request-gathered-for-" + name, this.evtListener);
-          },
-
         });
+        if (this.debug) {
+          console.log('[warp10-warpscript-http-proxy] - _handleResponse', event);
+        }
+        document.dispatchEvent(event);
+      },
+
+      //* **********************************************************************
+      // Other methods
+      //* **********************************************************************
+      _appendPresets: function() {
+        if (this.warpscript) {
+          return this.presets + '\n CLEAR \n' + this.warpscript;
+        }
+      },
+
+      register(name) {
+        if (!this.evtListener) {
+          this.evtListener = (evt) => {
+            if (this.debug) {
+              console.log('[warp10-warpscript-http-proxy] - evtListener', this);
+            }
+            if (evt.detail.warpscript) {
+              this.warpscript = evt.detail.warpscript;
+            }
+          };
+        }
+        document.addEventListener('request-gathered-for-' + name, this.evtListener);
+      },
+      unregister(name) {
+        document.removeEventListener('request-gathered-for-' + name, this.evtListener);
+      },
+
+    });
   </script>
 </dom-module>

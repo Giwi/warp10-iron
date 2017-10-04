@@ -15,7 +15,7 @@
 
     },
     behaviors: [
-      Polymer.IronValidatorBehavior
+      Polymer.IronValidatorBehavior,
     ],
     validateObject: function(obj) {
       let backendPattern = /^https?:\/\/.+$/;
@@ -37,6 +37,6 @@
         let value = Array.isArray(values) ? values.join('') : values;
         return (value.search(backendPattern) >= 0);
       }
-    }
+    },
   });
 </script>
