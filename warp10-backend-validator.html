@@ -18,10 +18,10 @@
       Polymer.IronValidatorBehavior
     ],
     validateObject: function(obj) {
-      var backendPattern= /^https?:\/\/.+$/
-      var valid = true;
+      let backendPattern = /^https?:\/\/.+$/;
+      let valid = true;
       for (key in obj) {
-        if (obj[key].search(backendPattern) < 0) {
+        if (obj.hasOwnProperty(key) && obj[key].search(backendPattern) < 0) {
           valid = false;
           break;
         }
@@ -29,12 +29,12 @@
       return valid;
     },
     validate: function(values) {
-      console.debug("[warp10-backend-validator] validate called", values)
-      var backendPattern= /^https?:\/\/.+$/
+      console.debug("[warp10-backend-validator] validate called", values);
+      let backendPattern = /^https?:\/\/.+$/;
       if (typeof values === 'object') {
         return this.validateObject(values);
       } else {
-        var value = Array.isArray(values) ? values.join('') : values;
+        let value = Array.isArray(values) ? values.join('') : values;
         return (value.search(backendPattern) >= 0);
       }
     }

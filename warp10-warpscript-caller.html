@@ -18,8 +18,10 @@
       }
     </style>
 
-    <iron-ajax id="xhr" url="{{url}}" content-type="application/x-www-form-urlencoded; charset=UTF-8" method='POST' body='{{warpscript}}'
-      handle-as="text" on-response="_handleResponse" on-error="_handleError" loading="{{loading}}" debounce-duration="{{debounceDuration}}"></iron-ajax>
+    <iron-ajax id="xhr" url="{{url}}" content-type="application/x-www-form-urlencoded; charset=UTF-8" method='POST'
+               body='{{warpscript}}'
+               handle-as="text" on-response="_handleResponse" on-error="_handleError" loading="{{loading}}"
+               debounce-duration="{{debounceDuration}}"></iron-ajax>
 
   </template>
 
@@ -185,13 +187,14 @@
       },
 
       _doCall: function() {
+        this.loading = true;
         console.debug("[warp10-warpscript-caller] doCall - Calling with WarpScript script", this.warpscript);
         this.lastRequest = this.$.xhr.generateRequest();
 
       },
       _doCallWithReload: function() {
         console.debug("[warp10-warpscript-caller] _doCallWithReload called with interval " + this._reloadInterval + " ms");
-        if(!this.loading) {
+        if (!this.loading) {
           this._doCall();
         }
         this._asyncTaskId = this.async(this._doCallWithReload, this._reloadInterval);
@@ -290,6 +293,7 @@
         this.fire('response', response, {
           bubbles: false
         });
+        this.loading = false;
       },
       _handleError: function(event, error) {
         error.elapsed = this._getElapsed(error.request);
@@ -301,6 +305,7 @@
         this.fire('error', error, {
           bubbles: false
         });
+        this.loading = false;
       },
 
     })

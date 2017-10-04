@@ -20,6 +20,7 @@
         url="[[url]]"
         warpscript="[[_warpscript]]"
         reload="[[interval]]"
+        loading="{{loading}}"
         on-response="_handleResponse"
         auto></warp10-warpscript-caller>
   </template>
@@ -73,6 +74,11 @@
             _warpscript: {
               type: String,
               computed: "_appendPresets(warpscript,presets)"
+            },
+            loading: {
+              type: Boolean,
+              value: false,
+              notify: true,
             }
           },
 
