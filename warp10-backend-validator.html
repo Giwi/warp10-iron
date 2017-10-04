@@ -20,7 +20,7 @@
     validateObject: function(obj) {
       let backendPattern = /^https?:\/\/.+$/;
       let valid = true;
-      for (key in obj) {
+      for (let key in obj) {
         if (obj.hasOwnProperty(key) && obj[key].search(backendPattern) < 0) {
           valid = false;
           break;
@@ -29,7 +29,7 @@
       return valid;
     },
     validate: function(values) {
-      console.debug("[warp10-backend-validator] validate called", values);
+      console.debug('[warp10-backend-validator] validate called', values);
       let backendPattern = /^https?:\/\/.+$/;
       if (typeof values === 'object') {
         return this.validateObject(values);
