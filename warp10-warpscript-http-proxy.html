@@ -20,6 +20,7 @@
         url="[[url]]"
         warpscript="[[_warpscript]]"
         reload="[[interval]]"
+        loading="{{loading}}"
         on-response="_handleResponse"
         auto></warp10-warpscript-caller>
   </template>
@@ -76,7 +77,13 @@
             type: Boolean,
             value: false,
         },
-    
+
+        loading: {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+
         _warpscript: {
           type: String,
           computed: '_appendPresets(warpscript,presets)',
@@ -129,7 +136,7 @@
           return this.presets + '\n CLEAR \n' + this.warpscript;
         }
       },
-    
+
       register(name) {
         if (!this.evtListener) {
           this.evtListener = (evt) => {

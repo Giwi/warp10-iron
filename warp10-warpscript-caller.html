@@ -18,8 +18,10 @@
       }
     </style>
 
-    <iron-ajax id="xhr" url="{{url}}" content-type="application/x-www-form-urlencoded; charset=UTF-8" method='POST' body='{{warpscript}}'
-      handle-as="text" on-response="_handleResponse" on-error="_handleError" loading="{{loading}}" debounce-duration="{{debounceDuration}}"></iron-ajax>
+    <iron-ajax id="xhr" url="{{url}}" content-type="application/x-www-form-urlencoded; charset=UTF-8" method='POST'
+               body='{{warpscript}}'
+               handle-as="text" on-response="_handleResponse" on-error="_handleError" loading="{{loading}}"
+               debounce-duration="{{debounceDuration}}"></iron-ajax>
 
   </template>
 
@@ -138,8 +140,8 @@
          * If true debug logs are sent to the console
          */
         debug: {
-            type: Boolean,
-            value: false,
+          type: Boolean,
+          value: false,
         },
       },
 
@@ -205,7 +207,7 @@
       },
       _doCallWithReload: function() {
         if (this.debug) {
-          console.log('[warp10-warpscript-caller] _doCallWithReload called with interval ' + this._reloadInterval + ' ms');
+          console.debug("[warp10-warpscript-caller] _doCallWithReload called with interval " + this._reloadInterval + " ms");
         }
         if (!this.loading) {
           this._doCall();
@@ -313,6 +315,7 @@
         this.fire('response', response, {
           bubbles: false,
         });
+        this.loading = false;
       },
       _handleError: function(event, error) {
         error.elapsed = this._getElapsed(error.request);
@@ -324,6 +327,7 @@
         this.fire('error', error, {
           bubbles: false,
         });
+        this.loading = false;
       },
 
     });
