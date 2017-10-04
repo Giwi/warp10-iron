@@ -29,29 +29,29 @@
 
 <script>
   Polymer({
-    is: "warp10-warpscript-caller",
+    is: 'warp10-warpscript-caller',
     properties: {
       /**
        * Base URL of WarpScript platform
        */
       baseUrl: {
         type: String,
-        value: ""
+        value: '',
       },
       /**
        * WarpScript script to execute
        */
-      warpscript:{
+      warpscript: {
         type: String,
-        value: "",
-        observer: 'warpscriptChanged'
+        value: '',
+        observer: 'warpscriptChanged',
       },
       /**
        * Stack received from server
        */
       data: {
         type: Object,
-        notify: true
+        notify: true,
       },
       /**
        * If received an erroneus response, error ++
@@ -59,15 +59,15 @@
       error: {
         type: Number,
         value: 0,
-        notify: true
+        notify: true,
       },
       /**
        * If received an erroneus response, here we displayu the message
        */
       errorMsg: {
         type: String,
-        value: "",
-        notify: true
+        value: '',
+        notify: true,
       },
       /**
        * If `reload > 0` it's the number of seconds between two calls
@@ -75,7 +75,7 @@
        */
       reload: {
         type: Number,
-        value: -1
+        value: -1,
       },
       /**
        * No call is done while `blockCalls` is 1
@@ -83,7 +83,7 @@
       blockCalls: {
         type: Number,
         value: 0,
-        observer: "blockChanged"
+        observer: 'blockChanged',
       },
       /**
        * No call is done while `call` is `0`
@@ -91,15 +91,15 @@
       call: {
         type: Number,
         value: 0,
-        observer: "callChanged"
+        observer: 'callChanged',
       },
       /**
        * Boolean to indicate loading in progress
        */
       loading: {
        type: Boolean,
-       value:false,
-       notify: true
+       value: false,
+       notify: true,
       },
       /**
        * Elapsed time for the call
@@ -107,7 +107,7 @@
       elapsed: {
         type: Number,
         value: -1,
-        notify: true
+        notify: true,
       },
       /**
        * Non standard header name
@@ -119,13 +119,13 @@
        */
       headerName: {
         type: String,
-        value: null
-      }
+        value: null,
+      },
     },
-    attached: function() {      
-      console.debug("[warp10-warpscript-caller] attached");
+    attached: function() {
+      console.debug('[warp10-warpscript-caller] attached');
       this._isAttached = true;
-      
+  
 
       // Look for a global conf, and apply if it exists
       if (window.quantumConf !== undefined) {
@@ -153,7 +153,6 @@
       this.initCall();
     },
     initCall: function() {
-
       if (!this.isAttached) {
         // If widget isn't attached, we do nothing yet
         // console.debug("[warp10-warpscript-caller] initCall - is not attached, quitting");
@@ -197,17 +196,17 @@
     },
     doCallWithReload: function() {
       // console.debug("[warp10-warpscript-caller] doReload called with interval "+this.reloadInterval+" ms");
-      if(!this.loading) {
+      if (!this.loading) {
         this.doCall();
       }
       this.async(this.doCallWithReload, this.reloadInterval);
     },
 
     receivedResponse: function(event, ironRequest) {
-      var allowerHeaders =  ironRequest.xhr.getAllResponseHeaders().split(',').map(function(i){ return i.split(':')[0].trim(); });
-      console.debug("[warp10-warpscript-caller] receivedResponse - ", allowerHeaders);
-      
-      var elapsedHeader = "X-Warp10-Elapsed";
+      var allowerHeaders = ironRequest.xhr.getAllResponseHeaders().split(',').map(function(i) { return i.split(':')[0].trim(); });
+      console.debug('[warp10-warpscript-caller] receivedResponse - ', allowerHeaders);
+  
+      var elapsedHeader = 'X-Warp10-Elapsed';
       for (var i in allowerHeaders) {
         if (allowerHeaders[i].match('Elapsed')) {
           elapsedHeader = allowerHeaders[i];
@@ -216,19 +215,19 @@
       this.elapsed = ironRequest.xhr.getResponseHeader(elapsedHeader);
       this.error = 0;
       this.data = looseJSON.parse(ironRequest.response);
-      console.debug("[warp10-warpscript-caller] receivedResponse - Updated!", this.data);
+      console.debug('[warp10-warpscript-caller] receivedResponse - Updated!', this.data);
       // Desctivate spinner
       this.loading = false;
     },
     receivedError: function(event, ironRequest) {
-      console.debug("[warp10-warpscript-caller] receivedError - Updated!", ironRequest);
+      console.debug('[warp10-warpscript-caller] receivedError - Updated!', ironRequest);
       this.elapsed = -1;
       this.data = null;
-      this.errorMsg = ironRequest.request.statusText
+      this.errorMsg = ironRequest.request.statusText;
       this.error++;
       // Desctivate spinner
       this.loading = false;
     },
 
-  })
+  });
 </script>

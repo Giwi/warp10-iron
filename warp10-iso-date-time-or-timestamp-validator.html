@@ -18,14 +18,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     },
     behaviors: [
-      Polymer.IronValidatorBehavior
+      Polymer.IronValidatorBehavior,
     ],
     validate: function(values) {
-      console.debug("[warp10-iso-date-time-or-timestamp-validator] validate called", values)
+      console.debug('[warp10-iso-date-time-or-timestamp-validator] validate called', values);
       if (Date.parse(values) || String(~~Number(values)) === values) {
         return true;
       }
       return false;
-    }
+    },
   });
 </script>
