@@ -12,16 +12,17 @@
   <template>
     <style>
       :host {
-        display: none;
+        /*    display: none;*/
       }
     </style>
-
     <warp10-warpscript-caller
         url="[[url]]"
         warpscript="[[_warpscript]]"
         reload="[[interval]]"
-        loading="{{loading}}"
         on-response="_handleResponse"
+        on-request="_handleRequest"
+        on-error="_handleError"
+        debug="[[debug]]"
         auto></warp10-warpscript-caller>
   </template>
   <script>
@@ -29,8 +30,8 @@
       is: 'warp10-warpscript-http-proxy',
       properties: {
         /**
-          * The name of this instance of `warp10-warpscript-http-proxy`
-          */
+         * The name of this instance of `warp10-warpscript-http-proxy`
+         */
         name: {
           type: String,
           value: 'warpscript-http-proxy',
@@ -38,33 +39,33 @@
         },
 
         /**
-          * URL of WarpScript platform
-          */
+         * URL of WarpScript platform
+         */
         url: {
           type: String,
           value: '',
         },
 
         /**
-          * WarpScript script to execute
-          */
+         * WarpScript script to execute
+         */
         warpscript: {
           type: String,
           value: '',
         },
 
         /**
-          * If `interval`  > 0` it's the number of seconds between two calls
-          * to the WarpScript server.
-          */
+         * If `interval`  > 0` it's the number of seconds between two calls
+         * to the WarpScript server.
+         */
         interval: {
           type: Number,
           value: 0,
         },
 
         /**
-          * Presets to pre-append to the scripts
-          */
+         * Presets to pre-append to the scripts
+         */
         presets: {
           type: String,
           value: '',
@@ -73,9 +74,9 @@
         /**
          * If true debug logs are sent to the console
          */
-         debug: {
-            type: Boolean,
-            value: false,
+        debug: {
+          type: Boolean,
+          value: false,
         },
 
         loading: {
@@ -122,10 +123,45 @@
             response: response,
           },
         });
-        if (this.debug) {
-          console.log('[warp10-warpscript-http-proxy] - _handleResponse', event);
-        }
         document.dispatchEvent(event);
+        this.dispatchEvent(event);
+
+        this.loading.forEach(function(i) {
+          if (i.key === this.name) {
+            i.val = false;
+          }
+        }, this);
+        this.loading = this.loading.slice();
+        if (this.debug) {
+          console.log('[warp10-warpscript-http-proxy] - _handleResponse', event, this.loading);
+        }
+      },
+
+      _handleRequest: function(evt) {
+        if (this.loading.filter(function(i) {
+              return i.key === this.name;
+            }, this).length < 1) {
+          this.loading.push({key: this.name, val: true});
+        }
+        this.loading.forEach(function(i) {
+          if (i.key === this.name) {
+            i.val = true;
+          }
+        }, this);
+        if (this.debug) {
+          console.log('[warp10-warpscript-http-proxy] - _handleRequest', evt, this.name);
+        }
+      },
+
+
+      _handleError(event, error) {
+        this.loading.forEach(function(i) {
+          if (i.key === this.name) {
+            i.val = false;
+          }
+        });
+        this.loading = this.loading.slice();
+        console.error('[warp10-warpscript-http-proxy]  _handleError', event, error);
       },
 
       //* **********************************************************************
