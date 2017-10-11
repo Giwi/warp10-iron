@@ -116,29 +116,42 @@
       // Event listeners
       //* **********************************************************************
       _handleResponse: function(evt, response) {
-        let event = new CustomEvent('warpscript-request-gatherer-response', {
+        let event = new CustomEvent('response', {
           detail: {
-            proxy: this.name,
+            name: this.name,
             interval: this.interval,
             response: response,
           },
         });
-        document.dispatchEvent(event);
+        let gathererEvent = new CustomEvent('warpscript-request-gatherer-response', {
+          detail: {
+            name: this.name,
+            interval: this.interval,
+            response: response,
+          },
+        });
+        document.dispatchEvent(gathererEvent);
         this.dispatchEvent(event);
-
-        this.loading.forEach(function(i) {
+     /*   this.loading.forEach(function(i) {
           if (i.key === this.name) {
             i.val = false;
           }
         }, this);
-        this.loading = this.loading.slice();
+        this.loading = this.loading.slice();*/
         if (this.debug) {
           console.log('[warp10-warpscript-http-proxy] - _handleResponse', event, this.loading);
         }
       },
 
       _handleRequest: function(evt) {
-        if (this.loading.filter(function(i) {
+        let event = new CustomEvent('request', {
+          detail: {
+            name: this.name
+          },
+        });
+        //    document.dispatchEvent(event);
+        this.dispatchEvent(event);
+      /*  if (this.loading.filter(function(i) {
               return i.key === this.name;
             }, this).length < 1) {
           this.loading.push({key: this.name, val: true});
@@ -147,21 +160,21 @@
           if (i.key === this.name) {
             i.val = true;
           }
-        }, this);
+        }, this);*/
         if (this.debug) {
           console.log('[warp10-warpscript-http-proxy] - _handleRequest', evt, this.name);
         }
       },
 
 
-      _handleError(event, error) {
-        this.loading.forEach(function(i) {
-          if (i.key === this.name) {
-            i.val = false;
-          }
+      _handleError(evt, error) {
+        let event = new CustomEvent('response', {
+          detail: {
+            name: this.name
+          },
         });
-        this.loading = this.loading.slice();
-        console.error('[warp10-warpscript-http-proxy]  _handleError', event, error);
+        this.dispatchEvent(event);
+        console.error('[warp10-warpscript-http-proxy]  _handleError', evt, error);
       },
 
       //* **********************************************************************

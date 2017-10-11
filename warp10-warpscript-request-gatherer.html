@@ -72,11 +72,11 @@
         return;
       }
       console.debug('[warp10-warpscript-request-gatherer] requestGathererResponse \n', {
-        proxy: evt.detail.proxy,
+        proxy: evt.detail.name,
         response: evt.detail.response,
       });
 
-      subscribers[evt.detail.proxy].forEach((s, i) => {
+      subscribers[evt.detail.name].forEach((s, i) => {
         let name = `${s.name}_${i}`;
         let event = new CustomEvent('response', {
           detail: evt.detail.response.stack[0][name],
