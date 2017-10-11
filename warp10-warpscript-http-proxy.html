@@ -132,12 +132,6 @@
         });
         document.dispatchEvent(gathererEvent);
         this.dispatchEvent(event);
-     /*   this.loading.forEach(function(i) {
-          if (i.key === this.name) {
-            i.val = false;
-          }
-        }, this);
-        this.loading = this.loading.slice();*/
         if (this.debug) {
           console.log('[warp10-warpscript-http-proxy] - _handleResponse', event, this.loading);
         }
@@ -149,18 +143,7 @@
             name: this.name
           },
         });
-        //    document.dispatchEvent(event);
         this.dispatchEvent(event);
-      /*  if (this.loading.filter(function(i) {
-              return i.key === this.name;
-            }, this).length < 1) {
-          this.loading.push({key: this.name, val: true});
-        }
-        this.loading.forEach(function(i) {
-          if (i.key === this.name) {
-            i.val = true;
-          }
-        }, this);*/
         if (this.debug) {
           console.log('[warp10-warpscript-http-proxy] - _handleRequest', evt, this.name);
         }
