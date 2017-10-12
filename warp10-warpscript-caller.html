@@ -168,7 +168,6 @@
           this.cancelAsync(this._asyncTaskId);
         }
       },
-
       /**
        * Performs an AJAX request to the specified URL with the WarpScript payload
        */
@@ -203,12 +202,15 @@
         if (this.debug) {
           console.log('[warp10-warpscript-caller] doCall - Calling with WarpScript script', this.warpscript);
         }
+        this.fire('request', this.warpscript, {
+          bubbles: false,
+        });
         this.lastRequest = this.$.xhr.generateRequest();
       },
       _doCallWithReload: function() {
         if (this.debug) {
           console.log(
-            `[warp10-warpscript-caller] _doCallWithReload called with interval ${this._reloadInterval} ms`);
+              `[warp10-warpscript-caller] _doCallWithReload called with interval ${this._reloadInterval} ms`, this.loading);
         }
         if (!this.loading) {
           this._doCall();

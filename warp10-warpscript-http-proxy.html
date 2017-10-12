@@ -15,13 +15,14 @@
         display: none;
       }
     </style>
-
     <warp10-warpscript-caller
         url="[[url]]"
         warpscript="[[_warpscript]]"
         reload="[[interval]]"
-        loading="{{loading}}"
         on-response="_handleResponse"
+        on-request="_handleRequest"
+        on-error="_handleError"
+        debug="[[debug]]"
         auto></warp10-warpscript-caller>
   </template>
   <script>
@@ -29,8 +30,8 @@
       is: 'warp10-warpscript-http-proxy',
       properties: {
         /**
-          * The name of this instance of `warp10-warpscript-http-proxy`
-          */
+         * The name of this instance of `warp10-warpscript-http-proxy`
+         */
         name: {
           type: String,
           value: 'warpscript-http-proxy',
@@ -38,33 +39,33 @@
         },
 
         /**
-          * URL of WarpScript platform
-          */
+         * URL of WarpScript platform
+         */
         url: {
           type: String,
           value: '',
         },
 
         /**
-          * WarpScript script to execute
-          */
+         * WarpScript script to execute
+         */
         warpscript: {
           type: String,
           value: '',
         },
 
         /**
-          * If `interval`  > 0` it's the number of seconds between two calls
-          * to the WarpScript server.
-          */
+         * If `interval`  > 0` it's the number of seconds between two calls
+         * to the WarpScript server.
+         */
         interval: {
           type: Number,
           value: 0,
         },
 
         /**
-          * Presets to pre-append to the scripts
-          */
+         * Presets to pre-append to the scripts
+         */
         presets: {
           type: String,
           value: '',
@@ -73,9 +74,9 @@
         /**
          * If true debug logs are sent to the console
          */
-         debug: {
-            type: Boolean,
-            value: false,
+        debug: {
+          type: Boolean,
+          value: false,
         },
 
         loading: {
@@ -115,17 +116,48 @@
       // Event listeners
       //* **********************************************************************
       _handleResponse: function(evt, response) {
-        let event = new CustomEvent('warpscript-request-gatherer-response', {
+        let event = new CustomEvent('response', {
           detail: {
-            proxy: this.name,
+            name: this.name,
             interval: this.interval,
             response: response,
           },
         });
+        let gathererEvent = new CustomEvent('warpscript-request-gatherer-response', {
+          detail: {
+            name: this.name,
+            interval: this.interval,
+            response: response,
+          },
+        });
+        document.dispatchEvent(gathererEvent);
+        this.dispatchEvent(event);
         if (this.debug) {
-          console.log('[warp10-warpscript-http-proxy] - _handleResponse', event);
+          console.log('[warp10-warpscript-http-proxy] - _handleResponse', event, this.loading);
         }
-        document.dispatchEvent(event);
+      },
+
+      _handleRequest: function(evt) {
+        let event = new CustomEvent('request', {
+          detail: {
+            name: this.name
+          },
+        });
+        this.dispatchEvent(event);
+        if (this.debug) {
+          console.log('[warp10-warpscript-http-proxy] - _handleRequest', evt, this.name);
+        }
+      },
+
+
+      _handleError(evt, error) {
+        let event = new CustomEvent('response', {
+          detail: {
+            name: this.name
+          },
+        });
+        this.dispatchEvent(event);
+        console.error('[warp10-warpscript-http-proxy]  _handleError', evt, error);
       },
 
       //* **********************************************************************
