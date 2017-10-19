@@ -1,23 +1,31 @@
 <!--
 @author Horacio Gonzalez (@lostinbrittany)
-@copyright (c) 2016 Cityzen Data
+@copyright (c) 2017 Cityzen Data
 @license Apache 2.0
 -->
-
 <link rel="import" href="../polymer/polymer.html">
-
-<link rel="import" href="../iron-validator-behavior/iron-validator-behavior.html">
+<link rel="import" href="../granite-validator-mixin/granite-validator-mixin.html">
 
 <script>
-  Polymer({
-    is: 'warp10-backend-validator',
-    properties: {
+  /* globals GraniteElements */
+  /* eslint new-cap: "off" */
 
-    },
-    behaviors: [
-      Polymer.IronValidatorBehavior,
-    ],
-    validateObject: function(obj) {
+  // Extend Polymer.Element base class
+  class Warp10BackendValidator extends GraniteElements.ValidatorMixin(Polymer.Element) {
+    static get is() {
+      return 'warp10-backend-validator';
+    }
+
+    static get properties() {
+      return {
+        debug: {
+          type: Boolean,
+          value: false,
+        },
+      };
+    }
+
+    validateObject(obj) {
       let backendPattern = /^https?:\/\/.+$/;
       let valid = true;
       for (let key in obj) {
@@ -27,9 +35,12 @@
         }
       }
       return valid;
-    },
-    validate: function(values) {
-      console.debug('[warp10-backend-validator] validate called', values);
+    }
+
+    validate(values) {
+      if (this.debug) {
+        console.log('[warp10-backend-validator] validate called', values);
+      }
       let backendPattern = /^https?:\/\/.+$/;
       if (typeof values === 'object') {
         return this.validateObject(values);
@@ -37,6 +48,9 @@
         let value = Array.isArray(values) ? values.join('') : values;
         return (value.search(backendPattern) >= 0);
       }
-    },
-  });
+    }
+  }
+
+  // Register custom element definition using standard platform API
+  customElements.define(Warp10BackendValidator.is, Warp10BackendValidator);
 </script>
