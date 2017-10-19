@@ -20,17 +20,25 @@
 </dom-module>
 
 <script>
-(function() {
-  Polymer({
-    is: 'warp10-simple-overlay',
-    properties: {
-    },
-    behaviors: [
-      Polymer.IronOverlayBehavior
-    ],
-    attached: function() {
-      console.debug('[warp10-simple-overlay] attached');
+  class Warp10SimpleOverlay extends Polymer.mixinBehaviors([Polymer.IronOverlayBehavior], Polymer.Element) {
+    static get is() { return 'warp10-simple-overlay' }
+    static get properties() {
+      return {
+        debug: {
+          type: Boolean,
+          value: false,
+        },
+      };
     }
-  });
-})();
+
+    connectedCallback() {
+      super.connectedCallback();
+      if (this.debug) {
+        console.log('[warp10-simple-overlay] attached');
+      }
+    }
+  }
+
+  // Register custom element definition using standard platform API
+  customElements.define(Warp10SimpleOverlay.is, Warp10SimpleOverlay);
 </script>
