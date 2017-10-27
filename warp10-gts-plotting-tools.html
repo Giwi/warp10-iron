@@ -11,7 +11,7 @@
       params: [],
     };
     plottingTools.isPlotted = function (gts) {
-      return plottingTools.id.indexOf(gts.id) >= 0;
+      return gts && gts.id && plottingTools.id.indexOf(gts.id) >= 0;
     };
     plottingTools.palette = [
       '#001f3f', // NAVY
@@ -37,7 +37,7 @@
       if (!plottingTools.isPlotted(gts)) {
         return '';
       }
-      // console.debug("[warp10-gts-plotting-tools] GTS plotted", gts.id);
+       console.debug("[warp10-gts-plotting-tools] GTS plotted", gts.id);
       let index = plottingTools.id.indexOf(gts.id);
       return 'background-color:' + plottingTools.params[index].color + ';';
     };
