@@ -138,11 +138,7 @@
       },
 
       _handleRequest: function(evt) {
-        let event = new CustomEvent('request', {
-          detail: {
-            name: this.name
-          },
-        });
+        let event = new CustomEvent('request', {detail: {name: this.name}});
         this.dispatchEvent(event);
         if (this.debug) {
           console.log('[warp10-warpscript-http-proxy] - _handleRequest', evt, this.name);
@@ -151,11 +147,7 @@
 
 
       _handleError(evt, error) {
-        let event = new CustomEvent('response', {
-          detail: {
-            name: this.name
-          },
-        });
+        let event = new CustomEvent('response', {detail: {name: this.name}});
         this.dispatchEvent(event);
         console.error('[warp10-warpscript-http-proxy]  _handleError', evt, error);
       },

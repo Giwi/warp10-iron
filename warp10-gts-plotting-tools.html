@@ -10,7 +10,7 @@
       color: [],
       params: [],
     };
-    plottingTools.isPlotted = function (gts) {
+    plottingTools.isPlotted = function(gts) {
       return plottingTools.id.indexOf(gts.id) >= 0;
     };
     plottingTools.palette = [
@@ -33,7 +33,7 @@
     ];
     plottingTools.maxColors = 16;
     plottingTools.currentColorIndex = -1;
-    plottingTools.gtsColor = function (gts) {
+    plottingTools.gtsColor = function(gts) {
       if (!plottingTools.isPlotted(gts)) {
         return '';
       }
@@ -41,23 +41,23 @@
       let index = plottingTools.id.indexOf(gts.id);
       return 'background-color:' + plottingTools.params[index].color + ';';
     };
-    plottingTools.getColor = function (index) {
+    plottingTools.getColor = function(index) {
       return plottingTools.palette[index % plottingTools.maxColors];
     };
-    plottingTools.nextColor = function () {
+    plottingTools.nextColor = function() {
       plottingTools.currentColorIndex += 1;
       return plottingTools.getColor(plottingTools.currentColorIndex);
     };
 
-    plottingTools.currentColor = function () {
+    plottingTools.currentColor = function() {
       return plottingTools.getColor(plottingTools.currentColorIndex);
     };
-    plottingTools.removeColorIfLast = function (color) {
+    plottingTools.removeColorIfLast = function(color) {
       if (color === plottingTools.currentColor()) {
         return plottingTools.currentColorIndex -= 1;
       }
     };
-    plottingTools.add = function (gts) {
+    plottingTools.add = function(gts) {
       if (!plottingTools.isPlotted(gts)) {
         // console.debug("[warp10-gts-plotting-tools] plottingTools.add() - The GTS " + 
         //    gts.id + " isn't currently plotted");
@@ -72,7 +72,7 @@
         plottingTools.id.push(gts.id);
       }
     };
-    plottingTools.remove = function (gts) {
+    plottingTools.remove = function(gts) {
       let index;
       if (plottingTools.isPlotted(gts)) {
         index = plottingTools.id.indexOf(gts.id);
@@ -85,7 +85,7 @@
         }
       }
     };
-    plottingTools.refresh = function (gtsList) {
+    plottingTools.refresh = function(gtsList) {
       console.debug('[warp10-gts-plotting-tools] plottingTools.refresh()', gtsList);
 
       // Variable to see if the GTS shown on graph still exists in new data
@@ -122,7 +122,7 @@
     };
 
 
-    plottingTools.gtsToNvd3 = function (gts) {
+    plottingTools.gtsToNvd3 = function(gts) {
       console.warning('[warp10-gts-plotting-tools] Deprecated function gtsToNvd3() - Please don\'t use it ');
       let nvd3Series = {
         key: '',
@@ -141,7 +141,7 @@
 
       if (gts.v !== undefined) {
         // Sort values
-        let values = gts.v.sort(function (a, b) {
+        let values = gts.v.sort(function(a, b) {
           return a.ts - b.ts;
         });
         values.forEach((metric) => {
@@ -152,13 +152,13 @@
       return nvd3Series;
     };
 
-    plottingTools.toNvd3Graph = function () {
+    plottingTools.toNvd3Graph = function() {
       let chartData = {};
 
       let sparklines = [];
       console.debug('[warp10-gts-plotting-tools] toNvd3Graph', plottingTools.data);
-      plottingTools.data.forEach((item) => {
-        if (plottingTools.isGtsToPlot(item, i)) {
+      plottingTools.data.forEach((item, i) => {
+        if (plottingTools.isGtsToPlot(item)) {
           let sl = plottingTools.data[i];
           sl.color = plottingTools.params[i].color;
           sl.key = plottingTools.data[i].key;
@@ -169,7 +169,7 @@
         }
       });
 
-      let tickFormat = function (d) {
+      let tickFormat = function(d) {
         let dx = sparklines[0].values[d] && sparklines[0].values[d].x || 0;
         return dx ? d3.time.format('%x')(new Date(dx)) : '';
       };
@@ -185,18 +185,17 @@
     };
 
 
-    plottingTools.isArray = function (value) {
+    plottingTools.isArray = function(value) {
       return value && typeof value === 'object' && value instanceof Array && typeof value.length === 'number'
         && typeof value.splice === 'function' && !(value.propertyIsEnumerable('length'));
     };
 
-    plottingTools.isGts = function (gts) {
+    plottingTools.isGts = function(gts) {
       return !((gts.c === null) || (gts.l === null)
         || (gts.values === null) || !plottingTools.isArray(gts.values));
-
     };
 
-    plottingTools.isGtsToPlot = function (gts) {
+    plottingTools.isGtsToPlot = function(gts) {
       if (!plottingTools.isGts(gts)) {
         return false;
       }
@@ -211,7 +210,7 @@
     plottingTools.MIN_TS = 0;
     plottingTools.MAX_TS = Math.pow(2, 53) - 1;
 
-    plottingTools.getTimeBounds = function (nvd3SeriesList) {
+    plottingTools.getTimeBounds = function(nvd3SeriesList) {
       // console.debug("[warp10-gts-plotting-tools] getTimeBounds ",nvd3SeriesList)
 
       let bounds = {};
@@ -245,5 +244,6 @@
     };
 
     window.plottingTools = plottingTools;
+  // eslint-disable-next-line no-invalid-this
   }).call(this);
 </script>
