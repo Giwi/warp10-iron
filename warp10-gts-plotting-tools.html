@@ -11,6 +11,7 @@
       params: [],
     };
     plottingTools.isPlotted = function(gts) {
+      if (!gts || !gts.id) { return false; }
       return plottingTools.id.indexOf(gts.id) >= 0;
     };
     plottingTools.palette = [
