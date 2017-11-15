@@ -11,7 +11,7 @@
       params: [],
     };
     plottingTools.isPlotted = function (gts) {
-      return plottingTools.id.indexOf(gts.id) >= 0;
+      return gts && gts.id && plottingTools.id.indexOf(gts.id) >= 0;
     };
     plottingTools.palette = [
       '#001f3f', // NAVY
