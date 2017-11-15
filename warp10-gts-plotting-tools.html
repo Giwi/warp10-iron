@@ -10,9 +10,8 @@
       color: [],
       params: [],
     };
-    plottingTools.isPlotted = function(gts) {
-      if (!gts || !gts.id) { return false; }
-      return plottingTools.id.indexOf(gts.id) >= 0;
+    plottingTools.isPlotted = function (gts) {
+      return gts && gts.id && plottingTools.id.indexOf(gts.id) >= 0;
     };
     plottingTools.palette = [
       '#001f3f', // NAVY
