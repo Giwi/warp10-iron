@@ -368,7 +368,8 @@
      * @return {{Boolean}}
      */
     gtsTools.isGts = function (item) {
-      return item && item.c && item.l  && item.a && item.v && !gtsTools.isArray(item.v);
+      return !(!item || item === null || item.c === null || item.l === null ||
+        item.a === null || item.v === null || !gtsTools.isArray(item.v));
     };
 
     /**
