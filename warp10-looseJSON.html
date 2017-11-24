@@ -1,4 +1,4 @@
-<script src="../big.js/big.min.js"></script>
+<script src="../big.js/big.js"></script>
 <script>
 /* global define */
 
@@ -17,7 +17,7 @@
     }
 // eslint-disable-next-line no-invalid-this
 }(this, function(Big) {
-    var looseJSON = {};
+    let looseJSON = {};
 
     // LooseJSON.parse adapted from Canop's JSON,parseMore https://github.com/Canop/JSON.parseMore/
     let at; // The index of the current character
@@ -51,7 +51,7 @@
       ch = text.charAt(at++);
     };
     let number = function() {
-      var string = '';
+      let string = '';
       if (ch === '-') {
         string = '-';
         check('-');
@@ -176,7 +176,7 @@
       error('Unexpected \'' + ch + '\'');
     };
     let array = function() {
-      var array = [];
+      let array = [];
       if (ch === '[') {
         check('[');
         white();
@@ -226,7 +226,7 @@
       }
       error('Bad object');
     };
-    var value = function() {
+    let value = function() {
       white();
       switch (ch) {
         case '{':
@@ -243,7 +243,7 @@
     };
 
     looseJSON.parse = function(source, reviver) {
-      var result;
+      let result;
       text = source;
       at = 0;
       ch = ' ';
@@ -278,7 +278,7 @@
     looseJSON.stringify = function(object) {
       console.debug('[looseJSON] stringify', object);
 
-      var json = JSON.stringify(object, function(key, value) {
+      let json = JSON.stringify(object, function(key, value) {
         if (value !== value) {
           return '__NaN__';
         }
@@ -294,7 +294,7 @@
         // The replacer's `value` param is already an String for a BigInt
         // so we need to use `this[key]` to get the object BigInt
         if (key instanceof Big ) {
-          var bigIntValue = key.toString();
+          let bigIntValue = key.toString();
           console.debug('[looseJSON] stringify - BigInt - ', bigIntValue);
           return '__BigInt__'+bigIntValue+'__';
         }
