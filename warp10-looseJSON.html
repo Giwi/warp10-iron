@@ -293,8 +293,8 @@
 
         // The replacer's `value` param is already an String for a BigInt
         // so we need to use `this[key]` to get the object BigInt
-        if (key instanceof Big ) {
-          let bigIntValue = key.toString();
+        if (this[key] instanceof Big ) {
+          let bigIntValue = this[key].toString();
           console.debug('[looseJSON] stringify - BigInt - ', bigIntValue);
           return '__BigInt__'+bigIntValue+'__';
         }
