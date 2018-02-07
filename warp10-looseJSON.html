@@ -281,7 +281,7 @@
         for (let i = 0; i < obj.length; i++) {
           obj[i] = looseJSON.slice(obj[i])
         }
-        if(count >= 100) {
+        if (count >= 100) {
           obj.push(`(... ${count - 100} more)`);
         }
         return obj;
@@ -296,13 +296,10 @@
       }
     };
 
-    looseJSON.stringify = function (json, truncated) {
-      let object = Object.create(json);
-      truncated = truncated || false;
-      console.debug('[looseJSON] stringify', object, truncated);
-      if (truncated) {
+    looseJSON.stringify = function (object, full) {
+      full = !!full;
+      if (!full) {
         object = looseJSON.slice(object);
-        console.debug('[looseJSON] stringify', object);
       }
       return JSON.stringify(object, function (key, value) {
         if (value !== value) {

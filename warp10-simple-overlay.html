@@ -9,7 +9,7 @@
       background: white;
       color: black;
       padding: 24px;
-      box-shadow: rgba(0, 0, 0, 0.24) -2.3408942051048403px 5.524510324047423px 12.090680100755666px 0px, rgba(0, 0, 0, 0.12) 0px 0px 12px 0px;
+      box-shadow: rgba(0, 0, 0, 0.24) -2.3408942051048403px 5.524510324047423px 12.090680100755666px 0, rgba(0, 0, 0, 0.12) 0 0 12px 0;
     }
   </style>
 
@@ -21,7 +21,10 @@
 
 <script>
   class Warp10SimpleOverlay extends Polymer.mixinBehaviors([Polymer.IronOverlayBehavior], Polymer.Element) {
-    static get is() { return 'warp10-simple-overlay'; }
+    static get is() {
+      return 'warp10-simple-overlay';
+    }
+
     static get properties() {
       return {
         debug: {

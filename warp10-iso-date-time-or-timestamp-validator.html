@@ -29,10 +29,7 @@
       if (this.debug) {
         console.log('[warp10-iso-date-time-or-timestamp-validator] validate called', values);
       }
-      if (Date.parse(values) || String(~~Number(values)) === values) {
-        return true;
-      }
-      return false;
+      return !!(Date.parse(values) || String(~~Number(values)) === values);
     }
   }
 

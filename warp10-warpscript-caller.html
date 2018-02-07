@@ -3,11 +3,11 @@
 @copyright (c) 2016 Cityzen Data
 @license Apache 2.0
 -->
-<link rel="import" href=" ../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/lib/utils/debounce.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
 
-<link rel="import" href=" ../iron-ajax/iron-ajax.html">
-
-<link rel="import" href=" ./warp10-looseJSON.html">
+<link rel="import" href="./warp10-looseJSON.html">
 
 <dom-module id="warp10-warpscript-caller">
   <template>
@@ -27,155 +27,165 @@
 
   <script>
     /* global looseJSON */
-    Polymer({
-      is: 'warp10-warpscript-caller',
 
-      /**
-       * Fired when a request is sent.
-       *
-       * @event request
-       */
+    /**
+     * Fired when a request is sent.
+     *
+     * @event request
+     */
 
-      /**
-       * Fired when a response is received.
-       *
-       * @event response
-       */
+    /**
+     * Fired when a response is received.
+     *
+     * @event response
+     */
 
-      /**
-       * Fired when an error is received.
-       *
-       * @event error
-       */
+    /**
+     * Fired when an error is received.
+     *
+     * @event error
+     */
 
-      properties: {
-        /**
-         * URL of WarpScript platform
-         */
-        url: {
-          type: String,
-          value: '',
-        },
+    class Warp10WarpscriptCaller extends Polymer.Element {
+      static get is() {
+        return 'warp10-warpscript-caller';
+      }
 
-        /**
-         * WarpScript script to execute
-         */
-        warpscript: {
-          type: String,
-          value: '',
-        },
+      static get properties() {
+        return {
+          /**
+           * URL of WarpScript platform
+           */
+          url: {
+            type: String,
+            value: '',
+          },
 
-        /**
-         * If `reload > 0` it's the number of seconds between two calls
-         * to the WarpScript server
-         */
-        reload: {
-          type: Number,
-          value: -1,
-        },
+          /**
+           * WarpScript script to execute
+           */
+          warpscript: {
+            type: String,
+            value: '',
+          },
 
-        /**
-         * If true, automatically performs an Ajax request when either `url` or
-         * `warpscript` changes.
-         */
-        auto: {
-          type: Boolean,
-          value: false,
-        },
+          /**
+           * If `reload > 0` it's the number of seconds between two calls
+           * to the WarpScript server
+           */
+          reload: {
+            type: Number,
+            value: -1,
+          },
 
-        /**
-         * Boolean to indicate loading in progress
-         */
-        loading: {
-          type: Boolean,
-          value: false,
-          notify: true,
-        },
+          /**
+           * If true, automatically performs an Ajax request when either `url` or
+           * `warpscript` changes.
+           */
+          auto: {
+            type: Boolean,
+            value: false,
+          },
 
-        /**
-         * The most recent request made by this iron-ajax element.
-         */
-        lastRequest: {
-          type: Object,
-          notify: true,
-          readOnly: true,
-        },
+          /**
+           * Boolean to indicate loading in progress
+           */
+          loading: {
+            type: Boolean,
+            value: false,
+            notify: true,
+          },
 
-        /**
-         * lastRequest's response.
-         *
-         * Note that lastResponse and lastError are set when lastRequest finishes,
-         * so if loading is true, then lastResponse and lastError will correspond
-         * to the result of the previous request.       *
-         *
-         * @type {Object}
-         */
-        lastResponse: {
-          type: Object,
-          notify: true,
-          readOnly: true,
-        },
+          /**
+           * The most recent request made by this iron-ajax element.
+           */
+          lastRequest: {
+            type: Object,
+            notify: true,
+            readOnly: true,
+          },
 
-        /**
-         * lastRequest's error, if any.
-         *
-         * @type {Object}
-         */
-        lastError: {
-          type: Object,
-          notify: true,
-          readOnly: true,
-        },
+          /**
+           * lastRequest's response.
+           *
+           * Note that lastResponse and lastError are set when lastRequest finishes,
+           * so if loading is true, then lastResponse and lastError will correspond
+           * to the result of the previous request.       *
+           *
+           * @type {Object}
+           */
+          lastResponse: {
+            type: Object,
+            notify: true,
+            readOnly: true,
+          },
 
-        /**
-         * Length of time in milliseconds to debounce multiple automatically generated requests.
-         */
-        debounceDuration: {
-          type: Number,
-          value: 0,
-          notify: true,
-        },
+          /**
+           * lastRequest's error, if any.
+           *
+           * @type {Object}
+           */
+          lastError: {
+            type: Object,
+            notify: true,
+            readOnly: true,
+          },
 
-        /**
-         * If true debug logs are sent to the console
-         */
-        debug: {
-          type: Boolean,
-          value: false,
-        },
-      },
+          /**
+           * Length of time in milliseconds to debounce multiple automatically generated requests.
+           */
+          debounceDuration: {
+            type: Number,
+            value: 0,
+            notify: true,
+          },
+
+          /**
+           * If true debug logs are sent to the console
+           */
+          debug: {
+            type: Boolean,
+            value: false,
+          },
+          _debouncer: {
+
+          }
+        };
+      }
 
 
-      observers: [
-        '_optionsChanged(url, warpscript, reload, auto)',
-      ],
+      static get observers() {
+        return ['_optionsChanged(url, warpscript, reload, auto)'];
+      }
 
       // *****************************************************
       // Lifecycle
       // *****************************************************
-      attached: function() {
+      attached() {
         if (this.debug) {
           console.log('[warp10-warpscript-caller] attached');
         }
         this.isAttached = true;
         this.fire('attached');
-      },
-      detached: function() {
+      }
+
+      detached() {
         if (this.debug) {
           console.log('[warp10-warpscript-caller] detached');
         }
         if (this._asyncTaskId) {
-          this.cancelAsync(this._asyncTaskId);
+          Polymer.Async.timeOut.cancel(this._asyncTaskId);
         }
-      },
+      }
+
       /**
        * Performs an AJAX request to the specified URL with the WarpScript payload
        */
-      generateRequest: function() {
+      generateRequest() {
         if (this.debug) {
           console.log('[warp10-warpscript-caller] generateRequest - WarpScript script', this.warpscript);
         }
-        this.cancelAsync(this._asyncTaskId);
+        Polymer.Async.timeOut.cancel(this._asyncTaskId);
         if (this.reload > 0) {
           // If `reload > 0` set reloading interval and call, else call directly
           this._reloadInterval = parseFloat(this.reload) * 1000;
@@ -184,130 +194,131 @@
         } else {
           this._doCall();
         }
-      },
+      }
 
 
-      _optionsChanged: function() {
+      _optionsChanged() {
         let context = this;
-        this.debounce('generate-request', function() {
-          if ((context.url === null) || (context.warpscript === undefined) || (context.warpscript.length <= 0)) {
-            return;
-          }
-          if (context.auto) {
-            context.generateRequest();
-          }
-        }, this.debounceDuration);
-      },
+        this._debouncer = Polymer.Debouncer.debounce(this._debouncer,
+          Polymer.Async.timeOut.after(this.debounceDuration),
+          () => {
+            if ((context.url === null) || (context.warpscript === undefined) || (context.warpscript.length <= 0)) {
+              return;
+            }
+            if (context.auto) {
+              context.generateRequest();
+            }
+          });
+      }
 
-      _doCall: function() {
+      _doCall() {
         if (this.debug) {
           console.log('[warp10-warpscript-caller] doCall - Calling with WarpScript script', this.warpscript);
         }
-        this.fire('request', this.warpscript, {
-          bubbles: false,
-        });
+        this.dispatchEvent(new CustomEvent('request', { bubbles: false, detail: this.warpscript, composed: true }));
         this.lastRequest = this.$.xhr.generateRequest();
-      },
-      _doCallWithReload: function() {
+      }
+
+      _doCallWithReload() {
         if (this.debug) {
           console.log(
-              `[warp10-warpscript-caller] _doCallWithReload called with interval ${this._reloadInterval} ms`, this.loading);
+            `[warp10-warpscript-caller] _doCallWithReload called with interval ${this._reloadInterval} ms`, this.loading);
         }
         if (!this.loading) {
           this._doCall();
         }
-        this._asyncTaskId = this.async(this._doCallWithReload, this._reloadInterval);
-      },
+        this._asyncTaskId = Polymer.Async.timeOut.run(this._doCallWithReload, this._reloadInterval);
+      }
 
-      _getElapsed: function(ironRequest) {
-        var allowerHeaders = ironRequest.xhr.getAllResponseHeaders().split('\n').map(function(i) {
+      _getElapsed(ironRequest) {
+        let allowerHeaders = ironRequest.xhr.getAllResponseHeaders().split('\n').map(function (i) {
           return i.split(':')[0].trim();
         });
         if (this.debug) {
           console.log('[warp10-warpscript-caller] _getElapsed - allowerHeaders', allowerHeaders);
         }
-        var elapsedHeader = 'X-Warp10-Elapsed';
-        for (var i in allowerHeaders) {
+        let elapsedHeader = 'X-Warp10-Elapsed';
+        for (let i in allowerHeaders) {
           if (allowerHeaders[i].match('-Elapsed')) {
             elapsedHeader = allowerHeaders[i];
           }
         }
         return ironRequest.xhr.getResponseHeader(elapsedHeader);
-      },
-      _getFetched: function(ironRequest) {
-        var allowerHeaders = ironRequest.xhr.getAllResponseHeaders().split('\n').map(function(i) {
+      }
+
+      _getFetched(ironRequest) {
+        let allowerHeaders = ironRequest.xhr.getAllResponseHeaders().split('\n').map(function (i) {
           return i.split(':')[0].trim();
         });
         if (this.debug) {
           console.log('[warp10-warpscript-caller] _getFetched - allowerHeaders', allowerHeaders);
         }
-        var fetchedHeader = 'X-Warp10-Fetched';
-        for (var i in allowerHeaders) {
+        let fetchedHeader = 'X-Warp10-Fetched';
+        for (let i in allowerHeaders) {
           if (allowerHeaders[i].match('-Fetched')) {
             fetchedHeader = allowerHeaders[i];
           }
         }
         return ironRequest.xhr.getResponseHeader(fetchedHeader);
-      },
-      _getOperations: function(ironRequest) {
-        var allowerHeaders = ironRequest.xhr.getAllResponseHeaders().split('\n').map(function(i) {
+      }
+
+      _getOperations(ironRequest) {
+        let allowerHeaders = ironRequest.xhr.getAllResponseHeaders().split('\n').map(function (i) {
           return i.split(':')[0].trim();
         });
         if (this.debug) {
           console.log('[warp10-warpscript-caller] _getOperations - allowerHeaders', allowerHeaders);
         }
-        var operationsHeader = 'X-Warp10-Ops';
-        for (var i in allowerHeaders) {
-          if (allowerHeaders[i].match('-Ops')) {
-            operationsHeader = allowerHeaders[i];
+        let operationsHeader = 'X-Warp10-Ops';
+        for (const allowerHeader of allowerHeaders) {
+          if (allowerHeader.match('-Ops')) {
+            operationsHeader = allowerHeader;
           }
         }
         return ironRequest.xhr.getResponseHeader(operationsHeader);
-      },
-      _getErrorLine: function(ironRequest) {
-        var allowerHeaders = ironRequest.xhr.getAllResponseHeaders().split('\n').map(function(i) {
+      }
+
+      _getErrorLine(ironRequest) {
+        let allowerHeaders = ironRequest.xhr.getAllResponseHeaders().split('\n').map(function (i) {
           return i.split(':')[0].trim();
         });
         if (this.debug) {
           console.log('[warp10-warpscript-caller] _getErrorLine - ironRequest.xhr.getAllResponseHeaders()',
-              ironRequest.xhr.getAllResponseHeaders());
+            ironRequest.xhr.getAllResponseHeaders());
         }
-        var errorLineHeader = 'X-Warp10-Error-Line';
-        for (var i in allowerHeaders) {
-          if (allowerHeaders[i].match('-Error-Line')) {
-            errorLineHeader = allowerHeaders[i];
+        let errorLineHeader = 'X-Warp10-Error-Line';
+        for (const allowerHeader of allowerHeaders) {
+          if (allowerHeader.match('-Error-Line')) {
+            errorLineHeader = allowerHeader;
           }
         }
         return ironRequest.xhr.getResponseHeader(errorLineHeader);
-      },
-      _getErrorMsg: function(ironRequest) {
-        var allowerHeaders = ironRequest.xhr.getAllResponseHeaders().split('\n').map(function(i) {
+      }
+
+      _getErrorMsg(ironRequest) {
+        let allowerHeaders = ironRequest.xhr.getAllResponseHeaders().split('\n').map(function (i) {
           return i.split(':')[0].trim();
         });
         if (this.debug) {
           console.log('[warp10-warpscript-caller] _getOperations - allowerHeaders', allowerHeaders);
         }
-        var errorMsgHeader = 'X-Warp10-Error-Message';
-        for (var i in allowerHeaders) {
-          if (allowerHeaders[i].match('-Error-Message')) {
-            errorMsgHeader = allowerHeaders[i];
+        let errorMsgHeader = 'X-Warp10-Error-Message';
+        for (const allowerHeader of allowerHeaders) {
+          if (allowerHeader.match('-Error-Message')) {
+            errorMsgHeader = allowerHeader;
           }
         }
         return ironRequest.xhr.getResponseHeader(errorMsgHeader);
-      },
-      _handleResponse: function(event, ironRequest) {
-        event.stopPropagation();
-        var elapsed = this._getElapsed(ironRequest);
-        var fetched = this._getFetched(ironRequest);
-        var operations = this._getOperations(ironRequest);
-        var stack = looseJSON.parse(ironRequest.response);
+      }
 
-        var response = {
-          stack: stack,
+      _handleResponse(event, ironRequest) {
+        event.stopPropagation();
+        let response = {
+          stack: looseJSON.parse(ironRequest.response),
           options: {
-            elapsed: elapsed,
-            fetched: fetched,
-            operations: operations,
+            elapsed: this._getElapsed(ironRequest),
+            fetched: this._getFetched(ironRequest),
+            operations: this._getOperations(ironRequest),
           },
         };
 
@@ -316,25 +327,26 @@
         if (this.debug) {
           console.log('[warp10-warpscript-caller] receivedResponse - Updated!', response);
         }
-        this.fire('response', response, {
-          bubbles: false,
-        });
+
+        this.dispatchEvent(new CustomEvent('response', { bubbles: false, detail: response, composed: true }));
         this.loading = false;
-      },
-      _handleError: function(event, error) {
+      }
+
+      _handleError(event, error) {
         error.elapsed = this._getElapsed(error.request);
         error.fetched = this._getFetched(error.request);
         error.operations = this._getOperations(error.request);
 
         error.errorLine = this._getErrorLine(error.request);
         error.errorMsg = this._getErrorMsg(error.request);
-        this.fire('error', error, {
-          bubbles: false,
-        });
+        this.dispatchEvent(new CustomEvent('error', { bubbles: false, detail: error, composed: true }));
         this.loading = false;
-      },
+      }
 
-    });
+    }
+
+    // Register custom element definition using standard platform API
+    customElements.define(Warp10WarpscriptCaller.is, Warp10WarpscriptCaller);
   </script>
 
 </dom-module>
