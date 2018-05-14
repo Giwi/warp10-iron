@@ -33,13 +33,8 @@
       't': '\t',
     };
     let text;
-    let error = function (m) {
-      throw new Error({
-        name: 'SyntaxError',
-        message: m,
-        at: at,
-        text: text,
-      });
+    let error = function(m) {
+      throw new Error(`Syntax error - ${m} at char ${at} from '${text}'`);
     };
     let next = function (c) {
       return ch = text.charAt(at++);
@@ -163,16 +158,16 @@
           check('N');
           return NaN;
         case 'I':
-          check('I');
-          check('n');
-          check('f');
-          check('i');
-          check('n');
-          check('i');
-          check('t');
-          check('y');
-          return Infinity;
-      }
+        check('I');
+        check('n');
+        check('f');
+        check('i');
+        check('n');
+        check('i');
+        check('t');
+        check('y');
+        return Infinity;
+      } 
       error('Unexpected \'' + ch + '\'');
     };
     let array = function () {

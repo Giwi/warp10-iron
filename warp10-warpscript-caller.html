@@ -309,26 +309,44 @@
           }
         }
         return ironRequest.xhr.getResponseHeader(errorMsgHeader);
-      }
-
-      _handleResponse(event, ironRequest) {
+      },
+      _handleResponse: function(event, ironRequest) {
         event.stopPropagation();
-        let response = {
-          stack: looseJSON.parse(ironRequest.response),
-          options: {
-            elapsed: this._getElapsed(ironRequest),
-            fetched: this._getFetched(ironRequest),
-            operations: this._getOperations(ironRequest),
-          },
-        };
+        var elapsed = this._getElapsed(ironRequest);
+        var fetched = this._getFetched(ironRequest);
+        var operations = this._getOperations(ironRequest);
+        try {
+          var stack = looseJSON.parse(ironRequest.response);
 
-        this.lastResponse = response;
+          var response = {
+            stack: stack,
+            options: {
+              elapsed: elapsed,
+              fetched: fetched,
+              operations: operations,
+            },
+          };
 
-        if (this.debug) {
-          console.log('[warp10-warpscript-caller] receivedResponse - Updated!', response);
+          this.lastResponse = response;
+
+          if (this.debug) {
+            console.log('[warp10-warpscript-caller] receivedResponse - Updated!', response);
+          }
+          this.fire('response', response, {
+            bubbles: false,
+          });
+        } catch (error) {
+          console.log('[warp10-warpscript-caller] receivedResponse - error!', error);
+          error.request = ironRequest;
+          error.elapsed = elapsed;
+          error.fetched = fetched;
+          error.operations = operations;
+          error.errorMsg = error.message;
+          error.errorLine = 1;
+          this.fire('error', error, {
+            bubbles: false,
+          });
         }
-
-        this.dispatchEvent(new CustomEvent('response', { bubbles: false, detail: response, composed: true }));
         this.loading = false;
       }
 
